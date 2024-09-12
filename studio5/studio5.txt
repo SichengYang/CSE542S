@@ -1,0 +1,125 @@
+1. Qinzhou Song qinzhounick@wustl.edu Sicheng Yang sicheng@wustl.edu
+2. 
+fn main() {
+    let x = 6;
+    let y = 2;
+
+    let result = x * y + x + y;
+
+    println!("Result: {}", result);
+}
+
+println!("Result: {}", result);
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.92s
+     Running `target/debug/rustexpressions`
+Result: 20
+
+The multiplication has the highest precedence. If plus is higher than multiplication, the result would be different.
+
+3.
+
+let x = 6;
+let y = 3;
+
+println!("Larger: {}", {if x > y {x} else {y}});
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.83s
+     Running `target/debug/rustexpressions`
+Larger: 6
+
+4.
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+error[E0308]: `if` and `else` have incompatible types
+  --> src/main.rs:18:49
+   |
+18 |     println!("Larger: {}", {if x > y {x;} else {y}});
+   |                                       --        ^ expected `()`, found integer
+   |                                       ||
+   |                                       |help: consider removing this semicolon
+   |                                       expected because of this
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `rustexpressions` (bin "rustexpressions") due to previous error
+
+The Rust compiler complains about two branches return different data type because it want two branch to return same data type.
+
+5.
+
+let tuple = (6, 3);
+
+println!("Larger: {}", {match tuple { (x, y) => if x > y {x} else {y} }});
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.83s
+     Running `target/debug/rustexpressions`
+Larger: 6
+
+6.
+
+let mut v = Vec::new();
+
+for x in 0..10 {
+    v.push(x);
+}
+
+println!("Vector: {:?}", v);
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.11s
+     Running `target/debug/rustexpressions`
+Vector: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+7.
+
+let mut v = Vec::new();
+   |         ----- move occurs because `v` has type `Vec<i32>`, which does not implement the `Copy` trait
+...
+38 |     for j in v {
+   |              - `v` moved due to this implicit call to `.into_iter()`
+...
+42 |     println!("Vector: {:?}", v);
+   |                              ^ value borrowed here after move
+
+The loop expression cause every value in the vector gets moved out. We cannot use the value again in the later println.
+
+8.
+
+let mut v = Vec::new();
+
+for x in 0..10 {
+    v.push(x);
+}
+
+println!("Vector: {:?}", v);
+
+for j in &v {
+    println!("Element: {}", j);
+}
+
+println!("Vector: {:?}", v);
+
+[sicheng@iht32-1504.sif rustexpressions]$ cargo run
+   Compiling rustexpressions v0.1.0 (/home/warehouse/sicheng/cse542/rustexpressions)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.15s
+     Running `target/debug/rustexpressions`
+Vector: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Element: 0
+Element: 1
+Element: 2
+Element: 3
+Element: 4
+Element: 5
+Element: 6
+Element: 7
+Element: 8
+Element: 9
+Vector: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
