@@ -1,0 +1,163 @@
+1. Qinzhou Song qinzhounick@wustl.edu
+Sicheng Yang sicheng@wustl.edu
+
+2.
+pub const X: usize = 1;
+
+fn main() {
+    println!("x = {}", X);
+}
+
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.89s
+     Running `target/debug/rustmodules`
+x = 1
+
+3. 
+pub static X: usize = 1;
+
+fn main() {   
+	println!("x = {}", X);
+}
+
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.91s
+     Running `target/debug/rustmodules`
+x = 1
+
+4.
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+error[E0133]: use of mutable static is unsafe and requires unsafe function or block
+ --> src/main.rs:8:2
+  |
+8 |     x = 2;
+  |     ^^^^^ use of mutable static
+  |
+  = note: mutable statics can be mutated by multiple threads: aliasing violations or data races will cause undefined behavior
+
+error[E0133]: use of mutable static is unsafe and requires unsafe function or block
+ --> src/main.rs:9:21
+  |
+9 |     println!("x = {}", x);
+  |                        ^ use of mutable static
+  |
+  = note: mutable statics can be mutated by multiple threads: aliasing violations or data races will cause undefined behavior
+  = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+For more information about this error, try `rustc --explain E0133`.
+error: could not compile `rustmodules` (bin "rustmodules") due to 2 previous errors
+
+5.
+pub static mut X: usize = 1;
+
+fn main() {   
+	unsafe{ 
+		X = 2;
+		println!("x = {}", X);
+	}
+}
+
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.04s
+     Running `target/debug/rustmodules`
+x = 2
+
+6.
+println!("load return: {}", X.load(Ordering::SeqCst));
+X.store(2, Ordering::SeqCst);
+println!("Load after store: {}", X.load(Ordering::SeqCst));
+
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.80s
+     Running `target/debug/rustmodules`
+load return: 1
+Load after store: 2
+
+7.
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+error[E0601]: `main` function not found in crate `rustmodules`
+  --> src/main.rs:24:2
+   |
+24 | }
+   |  ^ the main function must be defined at the crate level (in `src/main.rs`)
+   |
+note: here is a function named `main`
+  --> src/main.rs:11:2
+   |
+11 |     fn main() {   
+   |     ^^^^^^^^^
+   = note: you have one or more functions named `main` not defined at the crate level
+   = help: consider moving the `main` function definitions
+
+For more information about this error, try `rustc --explain E0601`.
+error: could not compile `rustmodules` (bin "rustmodules") due to previous error
+
+8.
+error[E0425]: cannot find value `X` in this scope
+  --> src/main.rs:20:30
+   |
+20 |     println!("load return: {}", X.load(Ordering::SeqCst));
+   |                                 ^ not found in this scope
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:20:37
+   |
+20 |     println!("load return: {}", X.load(Ordering::SeqCst));
+   |                                        ^^^^^^^^ use of undeclared type `Ordering`
+   |
+
+error[E0425]: cannot find value `X` in this scope
+  --> src/main.rs:21:2
+   |
+21 |     X.store(2, Ordering::SeqCst);
+   |     ^ not found in this scope
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:21:13
+   |
+21 |     X.store(2, Ordering::SeqCst);
+   |                ^^^^^^^^ use of undeclared type `Ordering`
+   |
+
+error[E0425]: cannot find value `X` in this scope
+  --> src/main.rs:22:35
+   |
+22 |     println!("Load after store: {}", X.load(Ordering::SeqCst));
+   |                                      ^ not found in this scope
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+  --> src/main.rs:22:42
+   |
+22 |     println!("Load after store: {}", X.load(Ordering::SeqCst));
+   |                                             ^^^^^^^^ use of undeclared type `Ordering`
+   |
+
+9.
+mod studio7{
+	use std::sync::atomic::AtomicUsize;	
+	pub static X: AtomicUsize = AtomicUsize::new(1);
+}
+
+use std::sync::atomic::Ordering;
+use studio7::X;
+println!("load return: {}", X.load(Ordering::SeqCst));
+X.store(2, Ordering::SeqCst);
+println!("Load after store: {}", X.load(Ordering::SeqCst));
+
+[sicheng@iht32-1501 rustmodules]$ cargo run
+   Compiling rustmodules v0.1.0 (/home/warehouse/sicheng/cse542/rustmodules)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.99s
+     Running `target/debug/rustmodules`
+load return: 1
+Load after store: 2
+
+
