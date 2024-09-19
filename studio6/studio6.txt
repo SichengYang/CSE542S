@@ -1,0 +1,142 @@
+1.Nick Song qinzhounick@wustl.edu
+Sicheng Yang sicheng@wustl.edu
+
+2.
+Code:
+fn main() {
+    println!("(3+2) / (2-2) : {}", (3+2)/(2-2));
+}
+
+Output:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+error: this operation will panic at runtime
+ --> src/main.rs:2:36
+  |
+2 |     println!("(3+2) / (2-2) : {}", (3+2)/(2-2));
+  |                                    ^^^^^^^^^^^ attempt to divide `5_i32` by zero
+  |
+  = note: `#[deny(unconditional_panic)]` on by default
+
+error: could not compile `rusterrors` (bin "rusterrors") due to previous error
+
+Compiler reports compilation error
+
+3. 
+Code:
+fn divide(x: &u8, y: &u8){
+    println!("(x+y) / (y-y) : {}", (x+y)/(y-y));
+}
+
+fn main() {
+    #[cfg(oldexercise)] {
+        println!("(3+2) / (2-2) : {}", (3+2)/(2-2));
+    }
+
+    let x:u8 = 3;
+    let y:u8 = 2;
+    divide(&x, &y);
+}
+
+
+
+Output:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.69s
+     Running `target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', src/main.rs:2:36
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+It pass compilation and reports runtime error.
+
+
+
+
+4.
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.08s
+     Running `target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', src/main.rs:2:36
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/std/src/panicking.rs:593:5
+   1: core::panicking::panic_fmt
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:67:14
+   2: core::panicking::panic
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:117:5
+   3: rusterrors::divide
+             at ./src/main.rs:2:36
+   4: rusterrors::main
+             at ./src/main.rs:12:5
+   5: core::ops::function::FnOnce::call_once
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+
+
+5.
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.43s
+     Running `target/debug/rusterrors`
+(x+y) / (y-y) : 2
+
+
+6.
+Divide by zero:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.13s
+     Running `target/debug/rusterrors`
+thread 'main' panicked at 'attempt to divide by zero', src/main.rs:2:12
+stack backtrace:
+   0: rust_begin_unwind
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/std/src/panicking.rs:593:5
+   1: core::panicking::panic_fmt
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:67:14
+   2: core::panicking::panic
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/panicking.rs:117:5
+   3: rusterrors::divide
+             at ./src/main.rs:2:12
+   4: rusterrors::main
+             at ./src/main.rs:12:36
+   5: core::ops::function::FnOnce::call_once
+             at /rustc/8ede3aae28fe6e4d52b38157d7bfe0d3bceef225/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+not divide by zero:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.46s
+     Running `target/debug/rusterrors`
+(3+2) / 2 : 2
+
+
+
+7.
+Code:
+match divide(&x, &y){
+        Ok(result) => println!("(3+2) / (2-2) : {}", result),
+        Err(FAIL) => println!("Denominator is 0, invalid"),
+	_ => println!("Nothing happened"),
+
+    }
+
+
+not divide by zero:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.64s
+     Running `target/debug/rusterrors`
+(3+2) / (2-2) : 2
+
+divide by zero:
+[qinzhounick@iht32-1508 rusterrors]$ cargo run
+   Compiling rusterrors v0.1.0 (/home/warehouse/qinzhounick/cse542/studio6/rusterrors)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.58s
+     Running `target/debug/rusterrors`
+Denominator is 0, invalid
+
