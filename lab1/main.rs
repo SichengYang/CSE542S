@@ -1,4 +1,5 @@
 include!("declarations.rs");
+include!("script_gen.rs");
 use std::env;
 
 fn usage(program_name: &String){
@@ -43,7 +44,19 @@ fn recite(title: &String, play: &Play){
 
 }
 fn main() -> Result<(), u8> {
-    println!("Hello, world!");
+    	println!("Hello, world!");
+	
+	let mut config_file: String = "".to_string();
+	let parse_result = parse_args(&mut config_file);
+	match parse_result {
+		Err(FAIL_BAD_COMMANDLINE) => return Err(FAIL_BAD_COMMANDLINE),
+		_ => {}
+	}
+	
+	let mut play_name: String = "".to_string();
+	let mut play: Play = vec!();
 
-    Ok(())
+	
+
+    	Ok(())
 }
