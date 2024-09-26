@@ -24,8 +24,8 @@ collaborate code in class. Especially how to pack everybody's program together(e
 1. Please put all the file under lab1 folder
 2. use "rustc ./src/main.rs" to compile the program
 3. you can use "./main <configuration file>" to ignore warning message or 
-"./main <configuration file> whinge" to enable warning message. If you choose cargo run to debug the program,
-the configuration and content files should be place under target/debug.
+"./main <configuration file> whinge" to enable warning message. You can also use "cargo run <configuration file>"
+or "cargo run <configuration file> whinge"
 
 ## Test Cases
 
