@@ -94,7 +94,7 @@ fn process_config(play: &mut Play, config: &PlayConfig) -> Result<(), u8> {
 //add_config function
 //  add a line from config file to config vector
 fn add_config(line: &String, config: &mut PlayConfig){
-	let mut v: Vec<&str> = line.split_whitespace().collect();  //store the two strings into a vector	
+	let v: Vec<&str> = line.split_whitespace().collect();  //store the two strings into a vector	
 	if v.len() != TOKEN_NUM{  //if less or more than two strings
 		if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
 			println!("Config file line \"{}\" length not equal to 2", line);
