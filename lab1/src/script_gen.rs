@@ -96,20 +96,22 @@ fn process_config(play: &mut Play, config: &PlayConfig) -> Result<(), u8> {
 fn add_config(line: &String, config: &mut PlayConfig){
 	let mut v: Vec<&str> = line.split_whitespace().collect();  //store the two strings into a vector	
 	if v.len() != TOKEN_NUM{  //if less or more than two strings
-		if COMPLAIN.load(atomic::Ordering::SeqCst) {				
+		if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
 			println!("Config file line \"{}\" length not equal to 2", line);
 		}
-	}else{
+	}else{  //else, push character name and character file name to config
 		config.push((v[CHARACTER].to_string(), v[CHARACTER_FILE].to_string()));
 	}
 
 }
 
+//read_config function
+//  read the lines in config file
 fn read_config(file_name: &String, title:&mut String, config: &mut PlayConfig) -> Result<(), u8> {
 	let mut lines:Vec<String> = Vec::new();
-	match grab_trimmed_file_lines(file_name, &mut lines){
-		Err(e) => return Err(e),
-		Ok(_) => {
+	match grab_trimmed_file_lines(file_name, &mut lines){  //check if lines are extracted successfully
+		Err(e) => return Err(e),  //if not, return error
+		Ok(_) => {  //else, store the title and add the rest of the lines to config
 			*title = lines[TITLE].clone();
 			for line in lines.iter().skip(FIRST_LINE){
 				add_config(line, config);
@@ -119,14 +121,16 @@ fn read_config(file_name: &String, title:&mut String, config: &mut PlayConfig) -
 	Ok(())
 }
 
+//script_gen function
+//  read config file and process config file to add all the lines to play
 fn script_gen(title:&mut String, play: &mut Play, file_name: &String) -> Result<(), u8>{
 	let mut play_config: PlayConfig = vec![];
-	match read_config(file_name, title, &mut play_config){
-  		Err(e) => return Err(e),
-		_ => {	
-			match process_config(play, &play_config){
-				Err(e) => return Err(e),
-				_ => { return Ok(()); }
+	match read_config(file_name, title, &mut play_config){  //check if read the config file successfully
+  		Err(e) => return Err(e),  //if not, return error
+		_ => {	//if yes, process the config file
+			match process_config(play, &play_config){  //check if config file process successfully
+				Err(e) => return Err(e),  //if not, return error
+				_ => { return Ok(()); }  //else return Ok(())
 			}
 		} 
 	}
