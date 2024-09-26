@@ -171,7 +171,7 @@ Ay, amen!
 
 5. whinge mode on with incorrect formatted line *****************
 [sicheng@iht32-1507.sif lab1]$ ./main incorrect_line_config.txt whinge
-Config file line length not equal to 2
+Config file line "Incorrect" length not equal to 2
 * (long essay omitted) *
 
 6. Character's file include incorrect order number token
