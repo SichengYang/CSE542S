@@ -5,16 +5,11 @@ use std::io::BufRead;
 type PlayConfig = Vec<(String, String)>;
 
 const TITLE: usize = 0;
-const SKIP_TITLE:usize = 1;
-const CHARACTER_NAME: usize = 1;
+const FIRST_LINE:usize = 1;
 const CHARACTER: usize = 0;
 const CHARACTER_FILE: usize = 1;
 const TOKEN_NUM: usize = 2;
-
 const END_OF_FILE: usize = 0;
-const PARSE_FAIL: u8 = 2;
-const INVALID_FILENAME: u8 = 3;
-const FILE_READ_ERR: u8 = 4;
 
 fn add_script_line(play: &mut Play, line: &String, name: &String) {	
 	if !line.is_empty() {
@@ -42,7 +37,7 @@ fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Result
 		},
 		Err(_) => { 
 			println!("{} is not a valid filename", filename);
-			return Err(INVALID_FILENAME);
+			return Err(FAIL_GENERATE_SCRIPT);
 		}
 	};
 
@@ -58,7 +53,7 @@ fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Result
 			},
 			Err(_) => { 
 				println!("This file cannot be read");
-				return Err(FILE_READ_ERR);
+				return Err(FAIL_GENERATE_SCRIPT);
 			}
 		}	
 	}
@@ -80,8 +75,7 @@ fn process_config(play: &mut Play, config: &PlayConfig) -> Result<(), u8> {
 						}
 					}
 				}			
-			},
-			_ => {}		
+			}	
 		}
 		
 	}
@@ -108,7 +102,7 @@ fn read_config(file_name: &String, title:&mut String, config: &mut PlayConfig) -
 		Err(e) => return Err(e),
 		Ok(_) => {
 			*title = lines[TITLE].clone();
-			for line in lines.iter().skip(SKIP_TITLE){
+			for line in lines.iter().skip(FIRST_LINE){
 				add_config(line, config);
 			}
 		}
