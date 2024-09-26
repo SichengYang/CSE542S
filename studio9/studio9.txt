@@ -1,0 +1,129 @@
+1. Qinzhou Song qinzhounick@wustl.edu
+Sicheng Yang sicheng@wustl.edu
+
+2.
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+error[E0004]: non-exhaustive patterns: `_` not covered
+ --> src/main.rs:4:11
+  |
+4 |     match x {
+  |           ^ pattern `_` not covered
+  |
+  = note: the matched value is of type `usize`
+  = note: `usize` does not have a fixed maximum value, so a wildcard `_` is necessary to match exhaustively
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+  |
+5 ~         5 => println!("x=5"),
+6 +         _ => todo!()
+  |
+
+For more information about this error, try `rustc --explain E0004`.
+error: could not compile `rustenumspatterns` (bin "rustenumspatterns") due to previous error
+
+3.
+match x {
+    _ => println!("wild card match"),
+    5 => println!("x=5")
+}
+
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+warning: unreachable pattern
+ --> src/main.rs:6:9
+  |
+5 |         _ => println!("wild card match"),
+  |         - matches any value
+6 |         5 => println!("x=5")
+  |         ^ unreachable pattern
+  |
+  = note: `#[warn(unreachable_patterns)]` on by default
+
+warning: `rustenumspatterns` (bin "rustenumspatterns") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 1.17s
+     Running `target/debug/rustenumspatterns`
+wild card match
+
+The wild card is matched in this case because wild card takes everything.
+
+match x {
+    5 => println!("x=5"),
+    _ => println!("wild card match")
+}
+
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.80s
+     Running `target/debug/rustenumspatterns`
+x=5
+
+The first arm is matched
+
+4.
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.31s
+     Running `target/debug/rustenumspatterns`
+Tuple contains string and 5
+
+5.
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.99s
+     Running `target/debug/rustenumspatterns`
+wild card match
+
+Because the second element is different, so the first condition failed. The wild card case will be matched.
+
+6.
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.98s
+     Running `target/debug/rustenumspatterns`
+Tuple contains string and 5
+
+Because the first condition contains all the possible cases.
+
+7.
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.86s
+     Running `target/debug/rustenumspatterns`
+Convertion failed
+
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.79s
+     Running `target/debug/rustenumspatterns`
+u8 31 is found
+
+8.
+use std::str::FromStr;
+
+if let Ok(x) = u8::from_str("hello") {
+    println!("u8 {} is found", x);
+}
+else{
+    println!("Convertion failed");
+}
+
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.92s
+     Running `target/debug/rustenumspatterns`
+Convertion failed
+
+use std::str::FromStr;
+
+if let Ok(x) = u8::from_str("31") {
+    println!("u8 {} is found", x);
+}
+else{
+    println!("Convertion failed");
+}
+
+[sicheng@iht32-1501.sif rustenumspatterns]$ cargo run
+   Compiling rustenumspatterns v0.1.0 (/home/warehouse/sicheng/cse542/rustenumspatterns)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.84s
+     Running `target/debug/rustenumspatterns`
+u8 31 is found
