@@ -102,10 +102,10 @@ Ay, amen!
 usage: ./main <configuration_file_name> [whinge]
 Error: 1
 
-3. Configuration file have incorrect file name *****************
+3. Configuration file have incorrect file name
 [sicheng@iht32-1508.sif lab1]$ ./main wrong_config.txt
 ghost.txt is not a valid filename
-Error: 3
+Error: 2
 
 4. Winge mode on without error
 [sicheng@iht32-1507.sif lab1]$ ./main config.txt whinge
