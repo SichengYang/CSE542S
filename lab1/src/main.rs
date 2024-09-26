@@ -39,19 +39,21 @@ fn parse_args(config_name: & mut String) -> Result<(), u8>{
 
 }
 
+//recite function
+//  print out the entire play to command line
 fn recite(title: &String, play: &Play){
-	println!("Title of the play: {}", title);
-	let mut current_character: String = "".to_string();
+	println!("Title of the play: {}", title);  //print out title
+	let mut current_character: String = "".to_string();  //variable to keep track of current character
 
-	for tuple in play{
+	for tuple in play{  //loop through lines in play
 		match tuple{
-			(.., character, line)=> {
-				if !character.eq(&current_character){
+			(.., character, line)=> {  //destruct tuple to get character name and line
+				if !character.eq(&current_character){  //if it's a different character, print new character name
 					println!();
 					println!("{}.", character);
-					current_character = character.clone();
+					current_character = character.clone();  //update current to the new character
 				}
-				println!("{}", line);
+				println!("{}", line);  //print out the lines
 			}			
 		}
 	}
@@ -59,21 +61,21 @@ fn recite(title: &String, play: &Play){
 }
 
 fn main() -> Result<(), u8> {
-	let mut config_file: String = "".to_string();
-	let parse_result = parse_args(&mut config_file);
+	let mut config_file: String = "".to_string();  //variable to store config file name
+	let parse_result = parse_args(&mut config_file);  //variable to store return value from parse_args
 	match parse_result {
-		Err(FAIL_BAD_COMMANDLINE) => return Err(FAIL_BAD_COMMANDLINE),
+		Err(FAIL_BAD_COMMANDLINE) => return Err(FAIL_BAD_COMMANDLINE),  //if parse_args failed, return error
 		_ => {}
 	}
 	
-	let mut title: String = "".to_string();
-	let mut play: Play = vec!();
+	let mut title: String = "".to_string();  //variable to store play title
+	let mut play: Play = vec!();  //variable to store character and their lines
 
-	match script_gen(&mut title, &mut play, &config_file){
-		Err(e) => return Err(e),
+	match script_gen(&mut title, &mut play, &config_file){  //call script gen
+		Err(e) => return Err(e),  //if failed, return fail
 		_ => {
-			play.sort_by(|a, b| (a.0).cmp(&b.0));
-			recite(&title, &play);	
+			play.sort_by(|a, b| (a.0).cmp(&b.0));  //else, sort the lines in play
+			recite(&title, &play);	//  and print out the lines
 		}
 	}
 	
