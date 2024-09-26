@@ -102,9 +102,146 @@ Ay, amen!
 usage: ./main <configuration_file_name> [whinge]
 Error: 1
 
-3. Configuration file have incorrect file name
+3. Configuration file have incorrect file name *****************
 [sicheng@iht32-1508.sif lab1]$ ./main wrong_config.txt
 ghost.txt is not a valid filename
 Error: 3
 
-4. 
+4. Winge mode on without error
+[sicheng@iht32-1507.sif lab1]$ ./main config.txt whinge
+Title of the play: Hamlet Prince of Denmark ACT II Scene II A room in the Castle by William Shakespeare
+
+King.
+Welcome, dear Rosencrantz and Guildenstern!
+Moreover that we much did long to see you,
+The need we have to use you did provoke
+Our hasty sending. Something have you heard
+Of Hamlet's transformation; so I call it,
+Since nor the exterior nor the inward man
+Resembles that it was. What it should be,
+More than his father's death, that thus hath put him
+So much from the understanding of himself,
+I cannot dream of: I entreat you both
+That, being of so young days brought up with him,
+And since so neighbour'd to his youth and humour,
+That you vouchsafe your rest here in our court
+Some little time: so by your companies
+To draw him on to pleasures, and to gather,
+So much as from occasion you may glean,
+Whether aught, to us unknown, afflicts him thus,
+That, open'd, lies within our remedy.
+
+Queen.
+Good gentlemen, he hath much talk'd of you,
+And sure I am two men there are not living
+To whom he more adheres. If it will please you
+To show us so much gentry and good-will
+As to expend your time with us awhile,
+For the supply and profit of our hope,
+Your visitation shall receive such thanks
+As fits a king's remembrance.
+
+Rosencrantz.
+Both your majesties
+Might, by the sovereign power you have of us,
+Put your dread pleasures more into command
+Than to entreaty.
+
+Guildenstern.
+We both obey,
+And here give up ourselves, in the full bent,
+To lay our service freely at your feet,
+To be commanded.
+
+King.
+Thanks, Rosencrantz and gentle Guildenstern
+
+Queen.
+Thanks, Guildenstern and gentle Rosencrantz:
+And I beseech you instantly to visit
+My too-much-changed son.--Go, some of you,
+And bring these gentlemen where Hamlet is.
+
+Guildenstern.
+Heavens make our presence and our practices
+Pleasant and helpful to him!
+
+Queen.
+Ay, amen!
+
+5. whinge mode on with incorrect formatted line *****************
+[sicheng@iht32-1507.sif lab1]$ ./main incorrect_line_config.txt whinge
+Config file line length not equal to 2
+* (long essay omitted) *
+
+6. Character's file include incorrect order number token
+[sicheng@iht32-1507.sif lab1]$ ./main token_err_config.txt whinge
+Token 1a does not represent a value in usize
+* (long essay omitted) *
+
+7. Character file include blank line or a line with solely whitespace
+[sicheng@iht32-1507.sif lab1]$ ./main whitespace_config.txt whinge
+Title of the play: Hamlet Prince of Denmark ACT II Scene II A room in the Castle by William Shakespeare
+
+King.
+Welcome, dear Rosencrantz and Guildenstern!
+Moreover that we much did long to see you,
+The need we have to use you did provoke
+Our hasty sending. Something have you heard
+Of Hamlet's transformation; so I call it,
+Since nor the exterior nor the inward man
+Resembles that it was. What it should be,
+More than his father's death, that thus hath put him
+So much from the understanding of himself,
+I cannot dream of: I entreat you both
+That, being of so young days brought up with him,
+And since so neighbour'd to his youth and humour,
+That you vouchsafe your rest here in our court
+Some little time: so by your companies
+To draw him on to pleasures, and to gather,
+So much as from occasion you may glean,
+Whether aught, to us unknown, afflicts him thus,
+That, open'd, lies within our remedy.
+
+Queen.
+Good gentlemen, he hath much talk'd of you,
+And sure I am two men there are not living
+To whom he more adheres. If it will please you
+To show us so much gentry and good-will
+As to expend your time with us awhile,
+For the supply and profit of our hope,
+Your visitation shall receive such thanks
+As fits a king's remembrance.
+
+Rosencrantz.
+Both your majesties
+Might, by the sovereign power you have of us,
+Put your dread pleasures more into command
+Than to entreaty.
+
+Guildenstern.
+We both obey,
+And here give up ourselves, in the full bent,
+To lay our service freely at your feet,
+To be commanded.
+
+King.
+Thanks, Rosencrantz and gentle Guildenstern
+
+Queen.
+Thanks, Guildenstern and gentle Rosencrantz:
+And I beseech you instantly to visit
+My too-much-changed son.--Go, some of you,
+And bring these gentlemen where Hamlet is.
+
+Guildenstern.
+Heavens make our presence and our practices
+Pleasant and helpful to him!
+
+Queen.
+Ay, amen!
+
+9. Negative number in speaking order
+[sicheng@iht32-1507.sif lab1]$ ./main crazy_number_config.txt whinge
+Token -1 does not represent a value in usize
+* (long essay omitted) *
