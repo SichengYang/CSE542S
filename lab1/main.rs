@@ -73,5 +73,5 @@ fn main() -> Result<(), u8> {
 		}
 	}
 	
-    	Ok(())
+    Ok(())
 }
