@@ -1,0 +1,200 @@
+1. Sicheng Yang sicheng@wustl.edu
+Qinzhou Song qinzhounick@wustl.edu
+
+2.
+Code:
+struct Car{
+	name: String,
+	x: isize,
+	y: isize
+}
+
+impl Car{
+	fn new() ->Self{
+		Self{ name: "Foo".to_string(), x:0, y:0}
+	}
+}
+
+
+fn main() {
+    let c:Car = Car::new();
+    println!("Car: {} at {} {}", c.name, c.x, c.y);
+}
+
+
+Output:
+[qinzhounick@iht32-1504 rusttraitsgenerics]$ cargo run
+   Compiling rusttraitsgenerics v0.1.0 (/home/warehouse/qinzhounick/cse542/studio10/rusttraitsgenerics)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.33s
+     Running `target/debug/rusttraitsgenerics`
+Car: Foo at 0 0
+
+
+3.
+Code:
+use std::fmt;
+
+enum Direction{
+	East,
+	West,
+	South,
+	North
+}
+
+impl fmt::Display for Direction{
+	fn fmt (&self, f: &mut fmt::Formatter) -> fmt::Result{
+		match self {
+		    Direction::East => write!(f, "East"),
+		    Direction::West => write!(f, "West"),
+		    Direction::South => write!(f, "South"),
+		    Direction::North => write!(f, "North"),
+		}
+	}
+
+}
+
+struct Car{
+	name: String,
+	d: Direction,
+	x: isize,
+	y: isize
+}
+
+impl Car{
+	fn new() ->Self{
+		Self{ name: "Foo".to_string(), d: Direction::North, x:0, y:0}
+	}
+}
+
+
+fn main() {
+    let c:Car = Car::new();
+    println!("Car: {} at {} {} heaing {}", c.name, c.x, c.y, c.d.to_string());
+}
+
+
+Output:
+[qinzhounick@iht32-1504 rusttraitsgenerics]$ cargo run
+   Compiling rusttraitsgenerics v0.1.0 (/home/warehouse/qinzhounick/cse542/studio10/rusttraitsgenerics)
+warning: variants `East`, `West`, and `South` are never constructed
+ --> src/main.rs:4:2
+  |
+3 | enum Direction{
+  |      --------- variants in this enum
+4 |     East,
+  |     ^^^^
+5 |     West,
+  |     ^^^^
+6 |     South,
+  |     ^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `rusttraitsgenerics` (bin "rusttraitsgenerics") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 2.21s
+     Running `target/debug/rusttraitsgenerics`
+Car: Foo at 0 0 heaing North
+
+
+4.
+Output:
+[qinzhounick@iht32-1504 rusttraitsgenerics]$ cargo run
+   Compiling rusttraitsgenerics v0.1.0 (/home/warehouse/qinzhounick/cse542/studio10/rusttraitsgenerics)
+warning: variants `East`, `West`, and `South` are never constructed
+ --> src/main.rs:4:2
+  |
+3 | enum Direction{
+  |      --------- variants in this enum
+4 |     East,
+  |     ^^^^
+5 |     West,
+  |     ^^^^
+6 |     South,
+  |     ^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `rusttraitsgenerics` (bin "rusttraitsgenerics") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 1.41s
+     Running `target/debug/rusttraitsgenerics`
+Car: Foo at 0 0 heaing North
+Car: Foo at 0 1 heaing North
+
+
+5.
+Output:
+[qinzhounick@iht32-1504 rusttraitsgenerics]$ cargo run
+   Compiling rusttraitsgenerics v0.1.0 (/home/warehouse/qinzhounick/cse542/studio10/rusttraitsgenerics)
+    Finished dev [unoptimized + debuginfo] target(s) in 5.11s
+     Running `target/debug/rusttraitsgenerics`
+Car: Foo at 0 0 heaing North
+Car: Foo at 0 1 heaing North
+Car: Foo at -1 1 heaing West
+Car: Foo at -1 0 heaing South
+Car: Foo at -2 0 heaing West
+
+
+6.
+Code:
+#[derive(Copy,Clone,Debug)]
+enum Direction{
+
+#[derive(Debug)]
+struct Car{
+
+fn figure_eight<T: Mover + Turner + std::fmt::Debug> (c: &mut T){
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Left);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Left);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Left);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Right);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Right);
+	c.advance();
+	println!("Car: {:?}", c);
+	c.turn(Rotation::Right);
+	c.advance();
+	println!("Car: {:?}", c);
+}
+
+main:
+let mut c:Car = Car::new();
+figure_eight(&mut c);
+
+Output:
+[qinzhounick@iht32-1504 rusttraitsgenerics]$ cargo run
+   Compiling rusttraitsgenerics v0.1.0 (/home/warehouse/qinzhounick/cse542/studio10/rusttraitsgenerics)
+warning: field `name` is never read
+  --> src/main.rs:39:2
+   |
+38 | struct Car{
+   |        --- field in this struct
+39 |     name: String,
+   |     ^^^^
+   |
+   = note: `Car` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `rusttraitsgenerics` (bin "rusttraitsgenerics") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 1.28s
+     Running `target/debug/rusttraitsgenerics`
+Car: Car { name: "Foo", d: North, x: 0, y: 1 }
+Car: Car { name: "Foo", d: West, x: -1, y: 1 }
+Car: Car { name: "Foo", d: South, x: -1, y: 0 }
+Car: Car { name: "Foo", d: East, x: 0, y: 0 }
+Car: Car { name: "Foo", d: East, x: 1, y: 0 }
+Car: Car { name: "Foo", d: South, x: 1, y: -1 }
+Car: Car { name: "Foo", d: West, x: 0, y: -1 }
+Car: Car { name: "Foo", d: North, x: 0, y: 0 }
+
+
