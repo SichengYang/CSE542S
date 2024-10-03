@@ -1,0 +1,51 @@
+1. Qinzhou Song qinzhounick@wustl.edu
+Sicheng Yang sicheng@wustl.edu
+
+2. 
+Car: Car { name: "Foo", d: North, x: 0, y: 0 }
+
+3.
+Car: Car { name: "Foo", d: North, p: Position { x: 0, y: 0 } }
+
+4.
+impl AddAssign for Position{
+    fn add_assign(&mut self, other: Self){
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+5.
+Car: Car { name: "Foo", d: North, p: Position { x: 0, y: 0 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 1 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 2 } }
+Car: Car { name: "Foo", d: West, p: Position { x: -2, y: 2 } }
+Car: Car { name: "Foo", d: South, p: Position { x: -2, y: 1 } }
+Car: Car { name: "Foo", d: East, p: Position { x: -1, y: 1 } }
+Car: Car { name: "Foo", d: East, p: Position { x: 0, y: 1 } }
+Car: Car { name: "Foo", d: South, p: Position { x: 0, y: 0 } }
+Car: Car { name: "Foo", d: West, p: Position { x: -1, y: 0 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 1 } }
+
+The car reutrn to the original point after figure eight and do the right move on left and right turn, so we beliveve our implementation
+is correct.
+
+6.
+impl SubAssign for Position{
+    fn sub_assign(&mut self, other: Self){
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+    }
+}
+
+Car: Car { name: "Foo", d: North, p: Position { x: 0, y: 0 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 1 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 2 } }
+Car: Car { name: "Foo", d: West, p: Position { x: -2, y: 2 } }
+Car: Car { name: "Foo", d: South, p: Position { x: -2, y: 1 } }
+Car: Car { name: "Foo", d: East, p: Position { x: -1, y: 1 } }
+Car: Car { name: "Foo", d: East, p: Position { x: 0, y: 1 } }
+Car: Car { name: "Foo", d: South, p: Position { x: 0, y: 0 } }
+Car: Car { name: "Foo", d: West, p: Position { x: -1, y: 0 } }
+Car: Car { name: "Foo", d: North, p: Position { x: -1, y: 1 } }
+Car: Car { name: "Foo", d: North, p: Position { x: 0, y: 0 } }
