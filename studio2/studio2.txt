@@ -1,0 +1,85 @@
+1. Name: Nick Song qinzhounick@wustl.edu
+
+2. Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.75s
+     Running `target/debug/rusttypes`
+Doubled: 2
+Doubled: 4
+Doubled: 8
+Doubled: 16
+Doubled: 32
+Doubled: 64
+Doubled: 128
+thread 'main' panicked at 'attempt to multiply with overflow', src/main.rs:4:9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+3.Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.85s
+     Running `target/debug/rusttypes`
+Doubled: 2
+Doubled: 4
+Doubled: 8
+Doubled: 16
+Doubled: 32
+Doubled: 64
+Doubled: 128
+
+4. Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.90s
+     Running `target/debug/rusttypes`
+Iteration 0: 2
+Iteration 1: 4
+Iteration 2: 8
+Iteration 3: 16
+Iteration 4: 32
+Iteration 5: 64
+Iteration 6: 128
+
+
+5. Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.81s
+     Running `target/debug/rusttypes`
+Iteration 0: 2
+Iteration 1: 4
+Iteration 2: 8
+Iteration 3: 16
+Iteration 4: 32
+Iteration 5: 64
+Iteration 6: 128
+Iteration 7: 255
+
+6. Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.80s
+     Running `target/debug/rusttypes`
+Iteration 0: 2
+Iteration 1: 4
+Iteration 2: 8
+Iteration 3: 16
+Iteration 4: 32
+Iteration 5: 64
+Iteration 6: 128
+Iteration 7: 0
+
+7. Output:
+[qinzhounick@iht32-1501.sif rusttypes]$ cargo run
+   Compiling rusttypes v0.1.0 (/home/warehouse/qinzhounick/cse542/studio2/rusttypes)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.17s
+     Running `target/debug/rusttypes`
+Iteration 0: 2
+Iteration 1: 4
+Iteration 2: 8
+Iteration 3: 16
+Iteration 4: 32
+Iteration 5: 64
+Iteration 6: 128
+Vector: [1, 2, 4, 8, 16, 32, 64, 128]
