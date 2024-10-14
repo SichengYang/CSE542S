@@ -1,0 +1,137 @@
+1.Nick Song qinzhounick@wustl.edu
+
+2.
+[qinzhounick@iht32-1502 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.87s
+     Running `target/debug/rustreferences`
+X: 1
+Y: 1
+Z: 1
+
+3.
+[qinzhounick@iht32-1502 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+error[E0277]: can't compare `{integer}` with `&{integer}`
+  --> src/main.rs:10:14
+   |
+10 |     let w = y==z;
+   |              ^^ no implementation for `{integer} == &{integer}`
+   |
+   = help: the trait `PartialEq<&{integer}>` is not implemented for `{integer}`
+   = help: the following other types implement trait `PartialEq<Rhs>`:
+             f32
+             f64
+             i128
+             i16
+             i32
+             i64
+             i8
+             isize
+           and 6 others
+   = note: required for `&{integer}` to implement `PartialEq<&&{integer}>`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `rustreferences` (bin "rustreferences") due to previous error
+
+Comparison between second and thrid integers causes error because the third number is a reference of the second int.
+
+4.
+[qinzhounick@iht32-1502 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.81s
+     Running `target/debug/rustreferences`
+X: 1
+Y: 1
+Z: 1
+W: true
+
+5.
+[qinzhounick@iht32-1502 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+error[E0277]: can't compare `{integer}` with `&{integer}`
+  --> src/main.rs:10:15
+   |
+10 |     let w = *y==*z;
+   |               ^^ no implementation for `{integer} == &{integer}`
+   |
+   = help: the trait `PartialEq<&{integer}>` is not implemented for `{integer}`
+   = help: the following other types implement trait `PartialEq<Rhs>`:
+             f32
+             f64
+             i128
+             i16
+             i32
+             i64
+             i8
+             isize
+           and 6 others
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `rustreferences` (bin "rustreferences") due to previous error
+
+Because the two numbers are both dereferenced so that the same error occurs again.
+
+6.
+[qinzhounick@iht32-1502 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+error[E0506]: cannot assign to `x` because it is borrowed
+  --> src/main.rs:21:5
+   |
+17 |     let y = &x;
+   |             -- `x` is borrowed here
+...
+21 |     x = 2;
+   |     ^^^^^ `x` is assigned to here but it was already borrowed
+22 |     println!("New X: {}", x);
+23 |     println!("Y: {}", y);
+   |                       - borrow later used here
+
+For more information about this error, try `rustc --explain E0506`.
+error: could not compile `rustreferences` (bin "rustreferences") due to previous error
+
+The first number was borrowed by the second number and then reassigned. But the print function tries to print the second number, which has the borrowed value. That makes the reassignment of the first number invalid. In other words, you cannot assign to a borrowed mutable.
+
+7.
+error[E0506]: cannot assign to `*y` because it is borrowed
+  --> src/main.rs:21:5
+   |
+18 |     let z = &y;
+   |             -- `*y` is borrowed here
+...
+21 |     *y = 2;
+   |     ^^^^^^ `*y` is assigned to here but it was already borrowed
+...
+24 |     println!("Z: {}", z);
+   |                       - borrow later used here
+
+Same as Step 6, y is brrowed by immutable z so cannot reassign to y.
+
+8. 
+[qinzhounick@iht32-1508 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+warning: variable does not need to be mutable
+  --> src/main.rs:17:9
+   |
+17 |     let mut y = &mut x;
+   |         ----^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` on by default
+
+warning: `rustreferences` (bin "rustreferences") generated 1 warning (run `cargo fix --bin "rustreferences"` to apply 1 suggestion)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.88s
+     Running `target/debug/rustreferences`
+Y: 1
+New Y: 2
+
+9.
+[qinzhounick@iht32-1508 rustreferences]$ cargo run
+   Compiling rustreferences v0.1.0 (/home/warehouse/qinzhounick/cse542/studio4/rustreferences)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.89s
+     Running `target/debug/rustreferences`
+s2: One string
+s2: Two strings
+s: Two strings
+
