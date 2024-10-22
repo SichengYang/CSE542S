@@ -1,0 +1,121 @@
+1. Sicheng Yang sicheng@wustl.edu
+Qinzhou Song qinzhounick@wustl.edu
+
+2.
+Code:
+#[derive(Debug)]
+struct S1{
+    s: String
+}
+
+impl S1{
+    fn new(_s:&String)->Self{
+        Self{s:_s.clone()}
+    }
+}
+
+
+fn main() {
+    let x: S1 = S1::new(&"Hello,".to_string());
+    let y: S1 = S1::new(&"World!".to_string());
+    println!("struct 1 and 2: {:?} {:?}", x, y)
+}
+
+
+Output:
+[qinzhounick@iht32-1503 utilitytraits]$ cargo run
+   Compiling utilitytraits v0.1.0 (/home/warehouse/qinzhounick/cse542/studio12/utilitytraits)
+warning: field `s` is never read
+ --> src/main.rs:3:5
+  |
+2 | struct S1{
+  |        -- field in this struct
+3 |     s: String
+  |     ^
+  |
+  = note: `S1` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `utilitytraits` (bin "utilitytraits") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 1.51s
+     Running `target/debug/utilitytraits`
+struct 1 and 2: S1 { s: "Hello," } S1 { s: "World!" }
+
+3.
+Code:
+impl Drop for S1{
+    fn drop(&mut self){
+        println!("Dropped {}", self.s);
+    }
+}
+
+Output:
+[qinzhounick@iht32-1503 utilitytraits]$ cargo run
+   Compiling utilitytraits v0.1.0 (/home/warehouse/qinzhounick/cse542/studio12/utilitytraits)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.03s
+     Running `target/debug/utilitytraits`
+struct 1 and 2: S1 { s: "Hello," } S1 { s: "World!" }
+Dropped World!
+Dropped Hello,
+
+Whichever variable is initialized first gets dropped the last, reverse order.
+
+4.
+Code:
+
+struct S1<T: std::fmt::Display>{
+    s: T
+}
+
+impl<T> S1<T>{
+    fn new(_s:T) -> S1<T>{
+		S1::<T>{s:_s}
+	}
+}
+
+impl<T: std::fmt::Display> Drop for S1<T>{
+    fn drop(&mut self){
+        println!("Dropped {}", self.s);
+    }
+}
+
+impl<T: std::fmt::Display> fmt::Display for S1<T>{
+	fn fmt (&self, f: &mut fmt::Formatter) -> fmt::Result{
+		write!(f, "s: {}", self.s)
+	}
+
+}
+
+we added <T: std::fmt::Display> to all the trait implementations, and implemented fmt::Display for our struct.
+
+5.
+Output:
+[qinzhounick@iht32-1503 utilitytraits]$ cargo run
+   Compiling utilitytraits v0.1.0 (/home/warehouse/qinzhounick/cse542/studio12/utilitytraits)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.09s
+     Running `target/debug/utilitytraits`
+struct 1: S1 { s: "Hello,", z: "World!" }
+struct 2: S1 { s: 22, z: 33 }
+Dropped 22 33
+Dropped Hello, World!
+
+
+6.
+[qinzhounick@iht32-1503 utilitytraits]$ cargo run
+   Compiling utilitytraits v0.1.0 (/home/warehouse/qinzhounick/cse542/studio12/utilitytraits)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.23s
+     Running `target/debug/utilitytraits`
+struct 1: S1 { s: "Hello,", z: "" }
+struct 2: S1 { s: 22, z: 0 }
+
+
+7.
+[qinzhounick@iht32-1503 utilitytraits]$ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.06s
+     Running `target/debug/utilitytraits`
+struct 1: S1 { s: "Hello,", z: "" }
+struct 2: S1 { s: 22, z: 0 }
+Dropped 22 0
+Dropped Hello,
+
+we did not have an error
