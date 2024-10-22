@@ -1,0 +1,1 @@
+/home/warehouse/qinzhounick/cse542/LAB2/lab2/target/debug/lab2: /home/warehouse/qinzhounick/cse542/LAB2/lab2/src/lab2/declarations.rs /home/warehouse/qinzhounick/cse542/LAB2/lab2/src/lab2/mod.rs /home/warehouse/qinzhounick/cse542/LAB2/lab2/src/lab2/script_gen.rs /home/warehouse/qinzhounick/cse542/LAB2/lab2/src/main.rs
