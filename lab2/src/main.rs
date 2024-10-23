@@ -1,8 +1,8 @@
 pub mod lab2;
 use lab2::declarations::COMPLAIN;
-use lab2::declarations::Play;
 use lab2::declarations::FAIL_BAD_COMMANDLINE;
-use lab2::script_gen::script_gen;
+use lab2::play::Play;
+
 use std::env;
 use std::sync::atomic;
 
@@ -49,27 +49,6 @@ fn parse_args(config_name: & mut String) -> Result<(), u8>{
 
 }
 
-//recite function
-//  print out the entire play to command line
-fn recite(title: &String, play: &Play){
-	println!("Title of the play: {}", title);  //print out title
-	let mut current_character: String = "".to_string();  //variable to keep track of current character
-
-	for tuple in play{  //loop through lines in play
-		match tuple{
-			(.., character, line)=> {  //destruct tuple to get character name and line
-				if !character.eq(&current_character){  //if it's a different character, print new character name
-					println!();
-					println!("{}.", character);
-					current_character = character.clone();  //update current to the new character
-				}
-				println!("{}", line);  //print out the lines
-			}			
-		}
-	}
-
-}
-
 fn main() -> Result<(), u8> {
 	let mut config_file: String = "".to_string();  //variable to store config file name
 	let parse_result = parse_args(&mut config_file);  //variable to store return value from parse_args
@@ -78,15 +57,11 @@ fn main() -> Result<(), u8> {
 		_ => {}
 	}
 	
-	let mut title: String = "".to_string();  //variable to store play title
-	let mut play: Play = vec!();  //variable to store character and their lines
+	let mut play: Play = Play::new();  //variable to store character and their lines
 
-	match script_gen(&mut title, &mut play, &config_file){  //call script gen
+	match play.prepare(&config_file){  //call script gen
 		Err(e) => return Err(e),  //if failed, return fail
-		_ => {
-			play.sort_by(|a, b| (a.0).cmp(&b.0));  //else, sort the lines in play
-			recite(&title, &play);	//  and print out the lines
-		}
+		_ => play.recite()	//  and print out the lines
 	}
 	
     	Ok(())
