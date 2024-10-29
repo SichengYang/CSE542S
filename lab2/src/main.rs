@@ -2,6 +2,7 @@ pub mod lab2;
 use lab2::declarations::COMPLAIN;
 use lab2::declarations::FAIL_BAD_COMMANDLINE;
 use lab2::play::Play;
+use lab2::return_wrapper::ReturnWrapper;
 
 use std::env;
 use std::sync::atomic;
@@ -49,20 +50,20 @@ fn parse_args(config_name: & mut String) -> Result<(), u8>{
 
 }
 
-fn main() -> Result<(), u8> {
+fn main() -> ReturnWrapper{
 	let mut config_file: String = "".to_string();  //variable to store config file name
 	let parse_result = parse_args(&mut config_file);  //variable to store return value from parse_args
 	match parse_result {
-		Err(FAIL_BAD_COMMANDLINE) => return Err(FAIL_BAD_COMMANDLINE),  //if parse_args failed, return error
-		_ => {}
+		Err(FAIL_BAD_COMMANDLINE) => {return ReturnWrapper::new(Err(FAIL_BAD_COMMANDLINE));},  //if parse_args failed, return error
+		_ => {} 
 	}
 	
 	let mut play: Play = Play::new();  //variable to store character and their lines
 
 	match play.prepare(&config_file){  //call script gen
-		Err(e) => return Err(e),  //if failed, return fail
+		Err(e) => {return ReturnWrapper::new(Err(e));},  //if failed, return fail
 		_ => play.recite()	//  and print out the lines
 	}
 	
-    Ok(())
+    return ReturnWrapper::new(Ok(()));
 }

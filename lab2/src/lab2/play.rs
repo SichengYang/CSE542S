@@ -108,7 +108,7 @@ impl Play{
         while Self::player_still_have_dialog(&speaking_end_vec) {
             for player_index in 0..self.players.len() {
                 //check if the current speaking match our order
-                if(speaking_end_vec[player_index] == None){
+                if speaking_end_vec[player_index] == None {
                     continue;
                 }
 

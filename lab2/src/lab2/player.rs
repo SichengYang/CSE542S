@@ -1,8 +1,10 @@
 use crate::atomic;
 use crate::COMPLAIN;
 use crate::lab2::script_gen::grab_trimmed_file_lines;
+use std::cmp::Ordering;
 type PlayLines = Vec<(usize, String)>;
 
+#[derive(Eq, Ord)]
 pub struct Player{
     pub name: String,
     pub lines: PlayLines,
@@ -78,6 +80,23 @@ impl Player{
                     }		
                 }
             }
+        }
+    }
+}
+
+impl PartialEq for Player{
+    fn eq(&self, other: &Self) -> bool{
+        return self.next_line() == None && other.next_line() == None || self.lines[self.index].0 == other.lines[other.index].0;
+    }
+}
+
+impl PartialOrd for Player{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering>{
+        if self.next_line() == None && other.next_line() != None || self.lines[self.index].0 < other.lines[other.index].0{
+            return Some(Ordering::Less);
+        }
+        else{
+            return Some(Ordering::Greater);
         }
     }
 }
