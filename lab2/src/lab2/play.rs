@@ -22,12 +22,36 @@ impl Play{
         }
     }
 
+    //script_gen function
+    //  read config file and process config file to add all the lines to play
+    pub fn prepare(&mut self, file_name: &String) -> Result<(), u8>{
+        let mut play_config: PlayConfig = vec![];
+        match Self::read_config(file_name, &mut self.title, &mut play_config){  //check if read the config file successfully
+            Err(e) => return Err(e),  //if not, return error
+            _ => {	//if yes, process the config file
+                println!("play::prepare:");
+                println!("\tplay config: {:?}", play_config);
+
+                match self.process_config(&play_config){  //check if config file process successfully
+                    Err(e) => return Err(e),  //if not, return error
+                    _ => {  //else return Ok(())
+                        println!("prepare return");
+                        return Ok(()); 
+                    }
+                }
+            } 
+        }
+    }
+
     //process_config function
     //  process the lines in config file, not including title
     pub fn process_config(&mut self, config: &PlayConfig) -> Result<(), u8>{
         for element in config {	 //loop through the elements in config	
             match element {
                 (character_name, text_file) => {  //grab character name and their file names
+                    println!("play::process_config");
+                    println!("\t Processing: {} {}", character_name, text_file);
+                    
                     let mut player = Player::new(character_name);
                     match player.prepare(&text_file){
                         Err(e) => return Err(e),
@@ -71,52 +95,44 @@ impl Play{
         Ok(())
     }
 
-    //script_gen function
-    //  read config file and process config file to add all the lines to play
-    pub fn prepare(&mut self, file_name: &String) -> Result<(), u8>{
-        let mut play_config: PlayConfig = vec![];
-        match Self::read_config(file_name, &mut self.title, &mut play_config){  //check if read the config file successfully
-            Err(e) => return Err(e),  //if not, return error
-            _ => {	//if yes, process the config file
-                match self.process_config(&play_config){  //check if config file process successfully
-                    Err(e) => return Err(e),  //if not, return error
-                    _ => { return Ok(()); }  //else return Ok(())
-                }
-            } 
-        }
-    }
-
-
     //recite function
     //  print out the entire play to command line
     pub fn recite(&mut self){
         println!("Title of the play: {}", self.title);  //print out title
         let mut current_character: String = "".to_string();  //variable to keep track of current character
 
-        let mut cur_line = 0;
-        let mut found_cur_line = 0;
-        let mut players_done_speaking = 0;
-        
-        while players_done_speaking < self.players.len(){
-            for player in self.players.iter_mut(){  //loop through players
-                if let Some(index) = player.next_line(){
-                    if player.lines[index].0 > cur_line{
-                        break;
-                    }
-                    if player.lines[index].0 > cur_line{
-                        continue;
-                    }
-                    if player.lines[index].0 == cur_line{
-                        player.speak(&mut player.name.clone());
-                        cur_line += 1;
-                    }
-                }else{
-                    players_done_speaking += 1;
+        let mut speaking_end_vec = vec![Some(0); self.players.len()]; //Initialize every index to 0
+        let mut order_tracking = 0; // this is used to track whether every index is included, default start with 0
+
+        // print everyone's dialog
+        while Self::player_still_have_dialog(&speaking_end_vec) {
+            for player_index in 0..self.players.len() {
+                //check if the current speaking match our order
+                if(speaking_end_vec[player_index] == None){
+                    continue;
                 }
 
+                let current_player = &mut self.players[player_index];
+                if current_player.lines[current_player.index].0 == order_tracking{
+                    current_player.speak(&mut current_character);
+                    speaking_end_vec[player_index] = current_player.next_line();
+                }
             }
 
+            order_tracking += 1; // move to next speaking order
         }
+    }
 
+    // check whether everyone still have something to say return true false to indicate the end or not
+    fn player_still_have_dialog(speaking_end_vec: &Vec<Option<usize>>) -> bool{
+        let mut finish = true;
+
+        for index in speaking_end_vec{
+            if *index != None {
+                finish = false;
+            }
+        }
+        
+        return !finish;
     }
 }

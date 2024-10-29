@@ -64,5 +64,5 @@ fn main() -> Result<(), u8> {
 		_ => play.recite()	//  and print out the lines
 	}
 	
-    	Ok(())
+    Ok(())
 }

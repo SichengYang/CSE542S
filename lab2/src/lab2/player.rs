@@ -50,6 +50,9 @@ impl Player{
                     self.add_script_line(&line);						
                 }
                 self.lines.sort_by(|a, b| (a.0).cmp(&b.0));  //else, sort the lines in play
+
+                println!("player::prepare");
+                println!("\t self.lines: {:?}", self.lines);
             }
         }
     
