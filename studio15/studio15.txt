@@ -1,0 +1,87 @@
+1. Qinzhou Song qinzhounick@wustl.edu
+Sicheng Yang sicheng@wustl.edu
+
+2. 
+Code:
+let s: String = "Thanks, Rosencrantz and gentle Guildenstern.".to_string();
+let vec: Vec<String> = s.split_whitespace().map(str::to_string).collect();
+
+println!("vector: {:?}", vec);
+
+Output:
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.75s
+     Running `target/debug/rustcollections`
+vector: ["Thanks,", "Rosencrantz", "and", "gentle", "Guildenstern."]
+
+3.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 2.95s
+     Running `target/debug/rustcollections`
+vector: ["Thanks,", "Rosencrantz", "and", "gentle", "Guildenstern."]
+btree: {"Guildenstern.", "Rosencrantz", "Thanks,", "and", "gentle"}
+
+The order of element in btree is sorted.
+
+4.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 5.93s
+     Running `target/debug/rustcollections`
+vector: ["Thanks,", "Rosencrantz", "and", "gentle", "Guildenstern."]
+btree: {"Guildenstern.", "Rosencrantz", "Thanks,", "and", "gentle"}
+hashset: {"Thanks,", "and", "Rosencrantz", "Guildenstern.", "gentle"}
+
+The vector and btree is fixed order but btree is random order
+
+5.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 5.03s
+     Running `target/debug/rustcollections`
+vector: ["She", "sells", "sea", "shells", "by", "the", "sea", "shore."]
+btree: {"She", "by", "sea", "sells", "shells", "shore.", "the"}
+hashset: {"shells", "by", "the", "shore.", "sea", "She", "sells"}
+
+Set should be unique so duplicate words only result in one element
+
+6.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 3.39s
+     Running `target/debug/rustcollections`
+vector: ["She", "sells", "sea", "shells", "by", "the", "sea", "shore."]
+btree: {"She", "by", "sea", "sells", "shells", "shore.", "the"}
+hashset: {"sea", "the", "by", "sells", "She", "shells", "shore."}
+btreemap: {0: "She", 1: "sells", 2: "sea", 3: "shells", 4: "by", 5: "the", 6: "sea", 7: "shore."}
+
+the vector is the most familiar one. They both allow duplicates in values.
+
+7.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+    Finished dev [unoptimized + debuginfo] target(s) in 3.57s
+     Running `target/debug/rustcollections`
+vector: ["She", "sells", "sea", "shells", "by", "the", "sea", "shore."]
+btree: {"She", "by", "sea", "sells", "shells", "shore.", "the"}
+hashset: {"She", "shells", "sea", "by", "the", "shore.", "sells"}
+btreemap: {0: "She", 1: "sells", 2: "sea", 3: "shells", 4: "by", 5: "the", 6: "sea", 7: "shore."}
+btreemap2: {"She": 0, "by": 4, "sea": 6, "sells": 1, "shells": 3, "shore.": 7, "the": 5}
+
+This is similar to btreeset because key does not allow duplicates.
+
+8.
+[sicheng@shell rustcollections]$ cargo run
+   Compiling rustcollections v0.1.0 (/home/warehouse/sicheng/cse542/rustcollections)
+error[E0507]: cannot move out of index of `Vec<String>`
+  --> src/main.rs:30:26
+   |
+30 |         btreemap2.insert(vec[index], index);
+   |                          ^^^^^^^^^^ move occurs because value has type `String`, which does not implement the `Copy` trait
+
+For more information about this error, try `rustc --explain E0507`.
+error: could not compile `rustcollections` (bin "rustcollections") due to previous error
+
+Because the string does not have copy trait so the move will drop the value in the original dataset.
