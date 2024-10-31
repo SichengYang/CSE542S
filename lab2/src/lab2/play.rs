@@ -69,9 +69,9 @@ impl Play{
     //  add a line from config file to config vector
     pub fn add_config(line: &String, config: &mut PlayConfig){
         let v: Vec<&str> = line.split_whitespace().collect();  //store the two strings into a vector	
-        if v.len() != TOKEN_NUM{  //if less or more than two strings
+        if v.len() < TOKEN_NUM{  //if less or more than two strings
             if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
-                eprintln!("Config file line \"{}\" length not equal to 2", line);
+                eprintln!("Config file line \"{}\" does not have enough element (character filename)", line);
             }
         }else{  //else, push character name and character file name to config
             config.push((v[CHARACTER].to_string(), v[CHARACTER_FILE].to_string()));

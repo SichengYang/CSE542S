@@ -98,11 +98,7 @@ impl SceneFragment{
 
     //recite function
     //  print out the entire play to command line
-    pub fn recite(&mut self){
-        if !self.title.is_empty(){
-            println!("Title of the play: {}", self.title);  //print out title
-        }
-        
+    pub fn recite(&mut self){        
         let mut current_character: String = "".to_string();  //variable to keep track of current character
 
         let mut speaking_end_vec = vec![Some(0); self.players.len()]; //Initialize every index to 0
@@ -138,5 +134,47 @@ impl SceneFragment{
         }
         
         return !finish;
+    }
+
+    pub fn enter(&self, next_scene: &SceneFragment) {
+        if !self.title.is_empty(){
+            println!("Title of the play: {}", self.title);  //print out title
+        }
+
+        let prev_player_list: Vec<String> = self.players.iter().map(|player| player.name.clone()).collect();
+        let new_player_list: Vec<String> = next_scene.players.iter().map(|player| player.name.clone()).collect();
+
+        for player in new_player_list{
+            if !prev_player_list.contains(&player) {
+                println!("[Enter {player}.]");
+            }
+        }
+    }
+
+    pub fn enter_all(&self) {
+        if !self.title.is_empty(){
+            println!("Title of the play: {}", self.title);  //print out title
+        }
+
+        for player in self.players.iter(){
+            println!("[Enter {}.]", player.name);
+        }
+    }
+
+    pub fn exit(&self, prev_scene: &SceneFragment){
+        let prev_player_list: Vec<String> = self.players.iter().map(|player| player.name.clone()).collect();
+        let new_player_list: Vec<String> = prev_scene.players.iter().map(|player| player.name.clone()).collect();
+
+        for player in new_player_list.iter().rev(){
+            if !prev_player_list.contains(&player) {
+                println!("[Exit {player}.]");
+            }
+        }
+    }
+
+    pub fn exit_all(&self) {
+        for player in self.players.iter().rev(){
+            println!("[Exit {}.]", player.name);
+        }
     }
 }
