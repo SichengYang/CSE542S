@@ -1,0 +1,142 @@
+1. Sicheng Yang sicheng@wustl.edu
+Qinzhou Song qinzhounick@wustl.edu
+
+2.
+Code:
+struct Point{
+	x: f64,
+	y: f64
+}
+
+fn main() {
+	let point = Point{x: 1.1, y: 2.2};
+	println!("p is {} {}", point.x, point.y);
+}
+
+
+Output:
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.89s
+     Running `target/debug/ruststructs`
+p is 1.1 2.2
+
+
+3.
+error[E0277]: `Point` doesn't implement `Debug`
+ --> src/main.rs:8:24
+  |
+8 |     println!("p is {:?}", point);
+  |                           ^^^^^ `Point` cannot be formatted using `{:?}`
+  |
+
+
+4.
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+warning: fields `x` and `y` are never read
+ --> src/main.rs:3:2
+  |
+2 | struct Point{
+  |        ----- fields in this struct
+3 |     x: f64,
+  |     ^
+4 |     y: f64
+  |     ^
+  |
+  = note: `Point` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+  = note: `#[warn(dead_code)]` on by default
+
+warning: `ruststructs` (bin "ruststructs") generated 1 warning
+    Finished dev [unoptimized + debuginfo] target(s) in 0.80s
+     Running `target/debug/ruststructs`
+p is Point { x: 1.1, y: 2.2 }
+
+
+5.
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.73s
+     Running `target/debug/ruststructs`
+p is Point { x: 1.1, y: 2.2 }
+p is Point { x: 2.2, y: 1.1 }
+
+6.
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.81s
+     Running `target/debug/ruststructs`
+p is Point { x: 0.0, y: 0.0 }
+p is Point { x: 2.2, y: 1.1 }
+
+
+7.
+Code:
+#[derive(Debug)]
+struct Point<T>{
+	x: T,
+	y: T
+}
+
+impl<T> Point<T>{
+	pub fn new(_x:T, _y:T) -> Point<T>{
+		Point::<T>{x:_x, y:_y}
+	}
+}
+
+
+Output:
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.90s
+     Running `target/debug/ruststructs`
+p is Point { x: 0.0, y: 0.0 }
+p is Point { x: 2.2, y: 1.1 }
+
+8.
+Code:
+	let mut point = Point::<f64>::new(0.0, 0.0);
+	let mut p2 = Point::<usize>::new(1,2);
+	println!("p1 is {:?}", point);
+        println!("p2 is {:?}", p2);
+	point.x = 2.2;
+	point.y = 1.1;
+	p2.x = 2;
+	p2.y = 1;
+	println!("p1 is {:?}", point);
+	println!("p2 is {:?}", p2);
+
+
+Output:
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.84s
+     Running `target/debug/ruststructs`
+p1 is Point { x: 0.0, y: 0.0 }
+p2 is Point { x: 1, y: 2 }
+p1 is Point { x: 2.2, y: 1.1 }
+p2 is Point { x: 2, y: 1 }
+
+
+9.
+Code:
+	pub fn set(&mut self, _x:T, _y:T){
+		self.x = _x;
+		self.y = _y;
+	}
+
+main:	point.set(2.2, 1.1);
+	p2.set(2,1);
+
+Output:
+[qinzhounick@iht32-1501 ruststructs]$ cargo run
+   Compiling ruststructs v0.1.0 (/home/warehouse/qinzhounick/cse542/studio8/ruststructs)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.76s
+     Running `target/debug/ruststructs`
+p1 is Point { x: 0.0, y: 0.0 }
+p2 is Point { x: 1, y: 2 }
+p1 is Point { x: 2.2, y: 1.1 }
+p2 is Point { x: 2, y: 1 }
+
+
+We use the x and y fields through the new set method so that x and y are not unread anymore. There is no dead code. It's sufficient to access them through a method.
