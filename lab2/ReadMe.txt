@@ -7,10 +7,10 @@ Qinzhou Song qinzhounick@wustl.edu
 Sicheng Yang sicheng@wustl.edu
 
 * Program Design
-This program will generate scribe text based on configuration and each character's speaking. Our program
-will first read the configuration file and collect each character's speaking based on the configuration.
-After reading the text, our program will sort the scribe based on order provided and output the scribe on
-the screen. If the user enable whinge mode, we will also print out warning message related to error format.
+This program will loop through all the scene and print the speakers' saying with enter and exit information. we
+develop this progream using a module lab2. We divide the role into detailed pieces and make them seperate Structs
+like Play and Player etc. However, to make the use of program easier in the future, we simplify the call to play() and
+recite() and the entire program will run.
 
 * Observations:
 We find the collaboration in project is harder than we thought. I think we can talk about how to write 
