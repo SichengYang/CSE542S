@@ -1,4 +1,4 @@
-CSE 542 Fall 2024 Lab 1
+CSE 542 Fall 2024 Lab 2
 
 ## Basic Information about Project
 
@@ -28,8 +28,10 @@ We find the collaboration in project is harder than we thought. I think we can t
 collaborate code in class. Especially how to pack everybody's program together(eliminating errors).
 
 * Return Wrapper:
+We implement return wrapper that can auto encapsulate error and normal return to make main easy. In this code, we face import issue and solve this by adding use statements
 
 * Scene Fragments:
+We deal with differents fragments by calling enter, recite, and exit multiple times in play. When we wrote the enter and exit, the order of speaker is wrong, and we change it by using rev() methods. We also face communication issue in collaboration but fix at the end.
 
 * Testing:
 1. Normal without whinge mode:
