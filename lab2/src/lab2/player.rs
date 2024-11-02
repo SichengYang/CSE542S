@@ -4,7 +4,7 @@ use crate::lab2::script_gen::grab_trimmed_file_lines;
 use std::cmp::Ordering;
 type PlayLines = Vec<(usize, String)>;
 
-#[derive(Eq, Ord)]
+#[derive(Eq, Ord, Debug)]
 pub struct Player{
     pub name: String,
     pub lines: PlayLines,
@@ -53,8 +53,6 @@ impl Player{
                 }
                 self.lines.sort_by(|a, b| (a.0).cmp(&b.0));  //else, sort the lines in play
 
-                println!("player::prepare");
-                println!("\t self.lines: {:?}", self.lines);
             }
         }
     

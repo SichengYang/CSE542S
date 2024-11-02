@@ -13,7 +13,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 			f
 		},
 		Err(_) => {  //if not, print message and return error
-			println!("{} is not a valid filename", filename);
+			eprintln!("{} is not a valid filename", filename);
 			return Err(FAIL_GENERATE_SCRIPT);
 		}
 	};
@@ -29,7 +29,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 				lines.push(buffer.trim().to_string());	//add the trimmed line to lines
 			},
 			Err(_) => {  //if returned error, print message and return error
-				println!("This file cannot be read");
+				eprintln!("This file cannot be read");
 				return Err(FAIL_GENERATE_SCRIPT);
 			}
 		}	

@@ -10,13 +10,13 @@ use std::sync::atomic;
 const MIN: usize = 2; //need at least two command line arguments
 const MAX: usize = 3; //cannot have more than three command line arguments
 const PROGRAM_NAME_INDEX: usize = 0; //progarm name index
-const CONFIG_FILE_INDEX: usize = 1; //config file index
+const SCRIPT_FILE_INDEX: usize = 1; //config file index
 const OPTIONS_INDEX: usize = 2; //whinge option index
 
 //usage function
 //  print usage message
 fn usage(program_name: &String){
-    println!("usage: {} <configuration_file_name> [whinge]", program_name);
+    println!("usage: {} <script_file_name> [whinge]", program_name);
 
 }
 
@@ -43,7 +43,7 @@ fn parse_args(config_name: & mut String) -> Result<(), u8>{
 
 	}
 
-	*config_name = v[CONFIG_FILE_INDEX].clone();  //store config file name to config String reference
+	*config_name = v[SCRIPT_FILE_INDEX].clone();  //store config file name to config String reference
 
 
 	Ok(())
