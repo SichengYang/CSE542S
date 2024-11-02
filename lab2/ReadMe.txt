@@ -13,19 +13,26 @@ like Play and Player etc. However, to make the use of program easier in the futu
 recite() and the entire program will run.
 
 * Observations:
-We find the collaboration in project is harder than we thought. I think we can talk about how to write 
-collaborate code in class. Especially how to pack everybody's program together(eliminating errors).
+This assignment was confusing while we were changing the original play.rs and player.rs, but when we got to the scene_fragments.rs,
+  it all made sense. It was hard to implement the player speaking order without a bigger scope of knowing how the entire scene get printed out.
+The instructions were as detailed as lab1, which gave us flexibility on design choices. 
+We do appreciate that as it grants more satisfaction after we printed out the entire scene.
 
 ## Detailed Instruction
 * Modules:
-This program will generate scribe text based on configuration and each character's speaking. Our program
-will first read the configuration file and collect each character's speaking based on the configuration.
-After reading the text, our program will sort the scribe based on order provided and output the scribe on
-the screen. If the user enable whinge mode, we will also print out warning message related to error format.
+We added declarations and script_gen into our mod.rs and then we added use statement like use lab2::declarations
+  to use the public types, constants, and functions in main.rs.
+We changed the print statements under whinge mode so that they only print to the standard error stream.
+We had challenges where our script_gen function was private and cannot be used in main.rs so we made it a public function.
+We also had error from not including the atomic library in the script_gen file so we added that.
 
 * Structs:
-We find the collaboration in project is harder than we thought. I think we can talk about how to write 
-collaborate code in class. Especially how to pack everybody's program together(eliminating errors).
+We declared structs for Play with title and a vector of players and Player with PlayLines, name, and index. 
+  We mainly had problem with the recite function in Play, because the lines are now in seperate structs 
+  and we cannot sort all the lines at the same time. 
+We changed the recite function so that we had an universal order number that tracks the current line number,
+  then, we loop through all the players that still has remainning lines, if we found the line number, print it out,
+  if not, we skip the line number, if whinge is set, we complain about missing lines number, and go to the next one.
 
 * Return Wrapper:
 We implement return wrapper that can auto encapsulate error and normal return to make main easy. In this code, we face import issue and solve this by adding use statements
