@@ -74,7 +74,7 @@ impl SceneFragment{
             }
         }
         //push character name and character file name to config
-        if(v.len() >= TOKEN_NUM){
+        if v.len() >= TOKEN_NUM {
             config.push((v[CHARACTER].to_string(), v[CHARACTER_FILE].to_string()));
         }
         
