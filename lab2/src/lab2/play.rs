@@ -138,19 +138,21 @@ impl Play{
             if i==FIRST_FRAGMENT{
                 self.fragments[i].enter_all();
                 self.fragments[i].recite();
+                println!();
                 self.fragments[i].exit(&self.fragments[i+INDEXING]);
             }else if i==self.fragments.len()-INDEXING{
                 self.fragments[i].enter(&self.fragments[i-INDEXING]);
                 self.fragments[i].recite();
+                println!();
                 self.fragments[i].exit_all();
+                println!();
             }else{
                 self.fragments[i].enter(&self.fragments[i-INDEXING]);
                 self.fragments[i].recite();
+                println!();
                 self.fragments[i].exit(&self.fragments[i+INDEXING]);
+                println!();
             }
-
-            
-
         }   
     }
 }

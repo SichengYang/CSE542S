@@ -71,10 +71,11 @@ impl SceneFragment{
             if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
                 eprintln!("Config file line \"{}\" length not equal to 2", line);
             }
-        }else{  //else, push character name and character file name to config
+        }
+        // push character name and character file name to config
+        if v.len() >= TOKEN_NUM{
             config.push((v[CHARACTER].to_string(), v[CHARACTER_FILE].to_string()));
         }
-
     }
 
     //read_config function
