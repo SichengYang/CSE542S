@@ -107,7 +107,7 @@ impl Play{
                     eprintln!("Config file line \"{}\" has extra tokens", line);
                 }
             }
-            config.push((false, v[FIRST_TOKEN].to_string()));  //push false and 
+            config.push((false, v[FIRST_TOKEN].to_string()));  //push false and file name to script config
         }
         
 
@@ -134,25 +134,28 @@ impl Play{
     //recite function
     //  print out the entire play to command line
     pub fn recite(&mut self){
-        for i in 0..self.fragments.len(){
-            if i==FIRST_FRAGMENT{
+        for i in 0..self.fragments.len(){  //loop through all fragments
+            if i==FIRST_FRAGMENT{  //if it's the first fragment, enter_all
                 self.fragments[i].enter_all();
                 self.fragments[i].recite();
                 println!();
                 self.fragments[i].exit(&self.fragments[i+INDEXING]);
-            }else if i==self.fragments.len()-INDEXING{
+            }else if i==self.fragments.len()-INDEXING{  //if it's the last fragment, exit all
                 self.fragments[i].enter(&self.fragments[i-INDEXING]);
                 self.fragments[i].recite();
                 println!();
                 self.fragments[i].exit_all();
                 println!();
-            }else{
+            }else{  //if it's one of the middle fragments, enter, recite, and exit
                 self.fragments[i].enter(&self.fragments[i-INDEXING]);
                 self.fragments[i].recite();
                 println!();
                 self.fragments[i].exit(&self.fragments[i+INDEXING]);
                 println!();
             }
+
+            
+
         }   
     }
 }

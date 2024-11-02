@@ -54,16 +54,16 @@ fn main() -> ReturnWrapper{
 	let mut config_file: String = "".to_string();  //variable to store config file name
 	let parse_result = parse_args(&mut config_file);  //variable to store return value from parse_args
 	match parse_result {
-		Err(FAIL_BAD_COMMANDLINE) => {return ReturnWrapper::new(Err(FAIL_BAD_COMMANDLINE));},  //if parse_args failed, return error
+		Err(FAIL_BAD_COMMANDLINE) => {return ReturnWrapper::new(Err(FAIL_BAD_COMMANDLINE));},  //if parse_args failed, return error with wrapper
 		_ => {} 
 	}
 	
 	let mut play: Play = Play::new();  //variable to store character and their lines
 
 	match play.prepare(&config_file){  //call script gen
-		Err(e) => {return ReturnWrapper::new(Err(e));},  //if failed, return fail
+		Err(e) => {return ReturnWrapper::new(Err(e));},  //if failed, return fail using ReturnWrapper
 		_ => play.recite()	//  and print out the lines
 	}
 	
-    return ReturnWrapper::new(Ok(()));
+    return ReturnWrapper::new(Ok(()));  //return Ok(()) ReturnWrapper
 }
