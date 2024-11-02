@@ -331,10 +331,12 @@ Error: 2
 [sicheng@iht32-1502.sif lab2]$ ./main blank_line.txt 
 ** The ouput is the same as normal case
 
-4. Extra argument in config.txt
+4. Extra argument in config
+[sicheng@iht32-1502.sif lab2]$ ./main extra_token.txt
 The output is the same as normal case
 
 5. Whinge mode that complain about missing order
+[sicheng@iht32-1502.sif lab2]$ ./main normal.txt whinge
 ... (long text omitted)
 [Enter Guildenstern.]
 Character line "0" missing
@@ -354,6 +356,16 @@ Config file line "[scene]" missing scene title
 8. additional parameter with whinge mode
 [sicheng@iht32-1502.sif lab2]$ ./main extra_token.txt whinge
 Config file line "hamlet_ii_1a_config.txt extra" has extra tokens
+...
+
+9. extra command line argument
+[sicheng@iht32-1502.sif lab2]$ ./main normal.txt whinge extra
+usage: ./main <script_file_name> [whinge]
+Error: 1
+
+10. extra argument in config file
+[sicheng@iht32-1502.sif lab2]$ ./main extra_config.txt whinge
+Config file line "Polonius Polonius_hamlet_ii_1a.txt extra" length not equal to 2.
 ...
 
 * How to unpack the program: download the lab.zip and unzip the package
