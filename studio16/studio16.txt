@@ -1,0 +1,123 @@
+1. Sicheng Yang sicheng@wustl.edu
+Qinzhou Song qinzhounick@wustl.edu
+
+2.
+Output:
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.91s
+     Running `target/debug/rusttext`
+String: Hello, world! 
+UpperCase Num: 1 LowerCase Num: 9 Rest: 3
+
+Code:
+let s = "Hello, world!";
+let a = s.chars().filter(|c| c.is_ascii_uppercase()).count();
+let b = s.chars().filter(|c| c.is_ascii_lowercase()).count();
+let c = s.len() - a - b;
+
+println!("String: {} \nUpperCase Num: {} LowerCase Num: {} Rest: {}",s,a,b,c);
+
+3.
+Code:
+let s2: String = s.chars().rev().collect();
+    println!("Reversal: {}", s2);
+
+Output:
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.41s
+     Running `target/debug/rusttext`
+Original string: Hello, world! 
+UpperCase Num: 1 LowerCase Num: 9 Rest: 3
+Reversal: !dlrow ,olleH
+
+
+4.
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.28s
+     Running `target/debug/rusttext`
+kayak is palindrome? true
+administration is palindrome? false
+
+
+5.
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.27s
+     Running `target/debug/rusttext`
+778 ,,kayak,, 877 is palindrome? true
+  administration   is palindrome? false
+
+
+6.
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.35s
+     Running `target/debug/rusttext`
+778 ,,KayAK,, 877 is palindrome? true
+  administration   is palindrome? false
+
+7.
+Output:
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.48s
+     Running `target/debug/rusttext`
+778 ,,KayAK,, 877 is palindrome? true
+Eh! Ça va, la vache? is palindrome? true
+
+
+8.
+Output:
+[qinzhounick@iht32-1501 rusttext]$ cargo run
+   Compiling rusttext v0.1.0 (/home/warehouse/qinzhounick/cse542/studio16/rusttext)
+    Finished dev [unoptimized + debuginfo] target(s) in 1.48s
+     Running `target/debug/rusttext`
+778 ,,KayAK,, 877 is palindrome? true
+Eh! Ça va, la vache? is palindrome? true
+Ésope reste ici et se repose. is palindrome? true
+
+Code:
+fn ltoe(c: char) -> char{
+    match c{
+        'Ç' => return 'c',
+        'È'..='Ë' => return 'e',
+        _ => return c
+    }
+}
+
+fn palindrome(s: &str) -> bool{
+    let filtered_s:String = s.chars().map(|c| ltoe(c)).filter(|c| c.is_alphanumeric()).collect();
+    let lower_s = filtered_s.to_lowercase();
+    let s1:String = lower_s.chars().collect();
+    let s2:String = lower_s.chars().rev().collect();
+
+    //println!("{} {} {}", filtered_s, s1, s2);
+    return s1==s2;
+}
+
+
+
+fn main() {
+    #[cfg(oldexercise)]{
+        let s = "Hello, world!";
+        let a = s.chars().filter(|c| c.is_ascii_uppercase()).count();
+        let b = s.chars().filter(|c| c.is_ascii_lowercase()).count();
+        let c = s.len() - a - b;
+
+        println!("Original string: {} \nUpperCase Num: {} LowerCase Num: {} Rest: {}", s, a, b, c);
+
+        let s2: String = s.chars().rev().collect();
+        println!("Reversal: {}", s2);
+    }
+
+    let s1 = "778 ,,KayAK,, 877".to_string();
+    let s2 = "Eh! Ça va, la vache?".to_string();
+    let s3 = "Ésope reste ici et se repose.".to_string();
+
+    println!("{} is palindrome? {}", s1, palindrome(&s1));
+    println!("{} is palindrome? {}", s2, palindrome(&s2));
+    println!("{} is palindrome? {}", s3, palindrome(&s3));
+}
