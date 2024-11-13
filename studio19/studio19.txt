@@ -1,0 +1,82 @@
+1. Sicheng Yang sicheng@wustl.edu
+Qinzhou Song qinzhounick@wustl.edu
+
+2.
+[qinzhounick@iht32-1507 rustasyncserver]$ cargo run
+   Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+error[E0433]: failed to resolve: use of undeclared crate or module `async_std`
+ --> src/main.rs:1:5
+  |
+1 | use async_std::net::TcpListener;
+  |     ^^^^^^^^^ use of undeclared crate or module `async_std`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `rustasyncserver` (bin "rustasyncserver") due to previous error
+
+3.
+Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+warning: unused import: `async_std::net::TcpListener`
+ --> src/main.rs:1:5
+  |
+1 | use async_std::net::TcpListener;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: `rustasyncserver` (bin "rustasyncserver") generated 1 warning (run `cargo fix --bin "rustasyncserver"` to apply 1 suggestion)
+    Finished dev [unoptimized + debuginfo] target(s) in 42.48s
+     Running `target/debug/rustasyncserver`
+Hello, world!
+
+4.
+[qinzhounick@iht32-1507 rustasyncserver]$ cargo run
+   Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+error[E0728]: `await` is only allowed inside `async` functions and blocks
+ --> src/main.rs:6:17
+  |
+4 | fn main() {
+  |    ---- this is not `async`
+5 |     let bind_future = TcpListener::bind("127.0.0.1:7777");
+6 |     bind_future.await;
+  |                 ^^^^^ only allowed inside `async` functions and blocks
+
+For more information about this error, try `rustc --explain E0728`.
+error: could not compile `rustasyncserver` (bin "rustasyncserver") due to previous error
+
+5.
+[qinzhounick@iht32-1507 rustasyncserver]$ cargo run
+   Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+    Finished dev [unoptimized + debuginfo] target(s) in 11.43s
+     Running `target/debug/rustasyncserver`
+block_on succeeded
+Hello, world!
+
+6.
+[qinzhounick@iht32-1507 rustasyncserver]$ cargo run
+   Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+    Finished dev [unoptimized + debuginfo] target(s) in 6.31s
+     Running `target/debug/rustasyncserver`
+Run server succeeded
+Hello, world!
+
+7.
+[qinzhounick@iht32-1507 rustasyncserver]$ cargo run
+   Compiling rustasyncserver v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncserver)
+    Finished dev [unoptimized + debuginfo] target(s) in 6.62s
+     Running `target/debug/rustasyncserver`
+Bound successfully
+^C
+
+8.
+[qinzhounick@iht32-1507 debug]$ ./rustasyncserver 
+Bound successfully
+Data: hello, server
+Run server succeeded
+Hello, world!
+
+[qinzhounick@iht32-1507 rustasyncclient]$ cargo run
+   Compiling rustasyncclient v0.1.0 (/home/warehouse/qinzhounick/cse542/studio19/rustasyncclient)
+    Finished dev [unoptimized + debuginfo] target(s) in 6.55s
+     Running `target/debug/rustasyncclient`
+Successfully connect to the server
+Message sent successfully
