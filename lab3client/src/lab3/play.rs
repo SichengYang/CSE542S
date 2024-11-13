@@ -5,6 +5,7 @@ use crate::lab3::scene_fragment::SceneFragment;
 use super::declarations::FAIL_GENERATE_SCRIPT;
 
 use std::io::Write;
+use std::sync::{Arc, Mutex};
 
 const FIRST_FRAGMENT:usize = 0;
 const INDEXING: usize = 1;  //const for next and prev fragment index
@@ -13,7 +14,7 @@ const ONE_TOKEN: usize = 1;
 const REST_ELEMENTS: usize = 1;  //const for the rest of strings after [scene]
 
 type ScriptConfig = Vec<(bool, String)>;  //script config to store true, title or false, config_file_name
-type Fragments = Vec<SceneFragment>;  //fragments to store multiple scene fragments
+type Fragments = Vec<Arc<Mutex<SceneFragment>>>;  //fragments to store multiple scene fragments
 
 
 //play struct for the entire play
@@ -41,16 +42,28 @@ impl Play{
             } 
         }
 
-        //check if the fragments are non-empty and the title in the first fragment is non-empty
-        if !self.fragments.is_empty() && !self.fragments[FIRST_FRAGMENT].title.is_empty(){
-            return Ok(());
-        }else{  //if not print out error message and return error code
-            let result = writeln!(std::io::stderr().lock(), "Play prepare failed");
-            match result {
-                Err(e) => println!("Writeln error with {e}"),
-                _ => {}
+        match self.fragments[FIRST_FRAGMENT].lock(){
+            Ok(ref first_fragment) => {    
+                //check if the fragments are non-empty and the title in the first fragment is non-empty
+                if !self.fragments.is_empty() && !first_fragment.title.is_empty(){
+                    return Ok(());
+                }else{  //if not print out error message and return error code
+                    let result = writeln!(std::io::stderr().lock(), "Play prepare failed");
+                    match result {
+                        Err(e) => println!("Writeln error with {e}"),
+                        _ => {}
+                    }
+                    return Err(FAIL_GENERATE_SCRIPT);
+                }
             }
-            return Err(FAIL_GENERATE_SCRIPT);
+            _ => {
+                let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                match result {
+                    Err(e) => println!("Writeln error with {e}"),
+                    _ => {}
+                }
+                return Err(FAIL_GENERATE_SCRIPT);
+            }
         }
     }
 
@@ -65,12 +78,22 @@ impl Play{
                     title = new_title.to_string();
                 },
                 (false, text_file) => {  //if bool is false, create a new scenefragment
-                    let mut fragment = SceneFragment::new(&title);
+                    let fragment = Arc::new(Mutex::new(SceneFragment::new(&title)));
                     
-                    //run prepare function from SceneFragment
-                    match fragment.prepare(&text_file){
-                        Err(e) => return Err(e),
-                        _ => {}
+                    if let Ok(mut async_fragment) =  fragment.lock(){
+                        //run prepare function from SceneFragment
+                        match async_fragment.prepare(&text_file){
+                            Err(e) => return Err(e),
+                            _ => {}
+                        }
+                    }
+                    else{
+                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return Err(FAIL_GENERATE_SCRIPT);
                     }
 
                     //push the new fragment to the play struct
@@ -153,47 +176,90 @@ impl Play{
     //  print out the entire play to command line
     pub fn recite(&mut self){
         for i in 0..self.fragments.len(){  //loop through all fragments
-            if i==FIRST_FRAGMENT{  //if it's the first fragment, enter_all
-                self.fragments[i].enter_all();
-                self.fragments[i].recite();
-                let result = writeln!(std::io::stdout().lock(), "");
-                match result {
-                    Err(e) => println!("Writeln error with {e}"),
-                    _ => {}
-                }
-                self.fragments[i].exit(&self.fragments[i+INDEXING]);
-            }else if i==self.fragments.len()-INDEXING{  //if it's the last fragment, exit all
-                self.fragments[i].enter(&self.fragments[i-INDEXING]);
-                self.fragments[i].recite();
-                let result = writeln!(std::io::stdout().lock(), "");
-                match result {
-                    Err(e) => println!("Writeln error with {e}"),
-                    _ => {}
-                }
-                self.fragments[i].exit_all();
-                let result = writeln!(std::io::stdout().lock(), "");
-                match result {
-                    Err(e) => println!("Writeln error with {e}"),
-                    _ => {}
-                }
-            }else{  //if it's one of the middle fragments, enter, recite, and exit
-                self.fragments[i].enter(&self.fragments[i-INDEXING]);
-                self.fragments[i].recite();
-                let result = writeln!(std::io::stdout().lock(), "");
-                match result {
-                    Err(e) => println!("Writeln error with {e}"),
-                    _ => {}
-                }
-                self.fragments[i].exit(&self.fragments[i+INDEXING]);
-                let result = writeln!(std::io::stdout().lock(), "");
-                match result {
-                    Err(e) => println!("Writeln error with {e}"),
-                    _ => {}
+            if let Ok(ref mut fragment) = self.fragments[i].lock() {
+                if i==FIRST_FRAGMENT{  //if it's the first fragment, enter_all
+                    if let Ok(ref next_fragment) = self.fragments[i+INDEXING].lock(){
+                        fragment.enter_all();
+                        fragment.recite();
+                        let result = writeln!(std::io::stdout().lock(), "");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        fragment.exit(next_fragment);
+                    } else {
+                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return;
+                    }
+                }else if i==self.fragments.len()-INDEXING{  //if it's the last fragment, exit all
+                    if let Ok(ref prev_fragment) = self.fragments[i-INDEXING].lock(){
+                        fragment.enter(prev_fragment);
+                        fragment.recite();
+                        let result = writeln!(std::io::stdout().lock(), "");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        fragment.exit_all();
+                        let result = writeln!(std::io::stdout().lock(), "");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                    }else {
+                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return;   
+                    }
+                }else{  //if it's one of the middle fragments, enter, recite, and exit
+                    if let Ok(ref prev_fragment) = self.fragments[i-INDEXING].lock(){
+                        if let Ok(ref next_fragment) = self.fragments[i+INDEXING].lock(){
+                            fragment.enter(prev_fragment);
+                            fragment.recite();
+                            let result = writeln!(std::io::stdout().lock(), "");
+                            match result {
+                                Err(e) => println!("Writeln error with {e}"),
+                                _ => {}
+                            }
+                            fragment.exit(next_fragment);
+                            let result = writeln!(std::io::stdout().lock(), "");
+                            match result {
+                                Err(e) => println!("Writeln error with {e}"),
+                                _ => {}
+                            }
+                        }else{
+                            let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                            match result {
+                                Err(e) => println!("Writeln error with {e}"),
+                                _ => {}
+                            }
+                            return;   
+                        }
+                    } else {
+                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return;   
+                    }
                 }
             }
-
-            
-
+            else{
+                let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                match result {
+                    Err(e) => println!("Writeln error with {e}"),
+                    _ => {}
+                }
+                return;
+            }
         }   
     }
 }
