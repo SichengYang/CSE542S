@@ -101,7 +101,6 @@ impl Play{
                     title = "".to_string(); //set title to empty again
                 }
             }
-            
         }
 
         
