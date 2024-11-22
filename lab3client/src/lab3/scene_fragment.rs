@@ -2,8 +2,11 @@ use crate::lab3::script_gen::grab_trimmed_file_lines;
 use crate::atomic;
 use crate::COMPLAIN;
 use crate::lab3::player::Player;
+use crate::lab3::declarations::FAIL_CONCURRENCY;
 
 use std::io::Write;
+use std::cmp::Ordering;
+use std::sync::{Arc, Mutex};
 
 const CHARACTER: usize = 0;
 const CHARACTER_FILE: usize = 1;
@@ -11,11 +14,39 @@ const TOKEN_NUM: usize = 2;
 const SPOKEN: usize = 1;
 type PlayConfig = Vec<(String, String)>;  //vector to store character name and character file name
 
+
+fn cmp_player(p1: &Arc<Mutex<Player>>, p2:&Arc<Mutex<Player>>) -> Ordering{
+    if let Ok(ref async_p1) = p1.lock(){
+        if let Ok(ref async_p2) = p2.lock(){
+            match async_p1.partial_cmp(async_p2){
+                Some(ord) => return ord,
+                _ => return Ordering::Equal
+            }
+        }else{
+            let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::cmp function");
+            match result {
+                Err(e) => println!("Writeln error with {e}"),
+                _ => {}
+            }
+            return Ordering::Equal;
+        }
+    }else{
+        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::cmp function");
+        match result {
+            Err(e) => println!("Writeln error with {e}"),
+            _ => {}
+        }
+        return Ordering::Equal;
+    }
+}
+
+
+
 //SceneFragment strcut with scene title and vector of players
 #[derive(Debug)]
 pub struct SceneFragment{
     pub title: String,
-    pub players: Vec<Player>
+    pub players: Vec<Arc<Mutex<Player>>>
 }
 
 //implement function for SceneFragment
@@ -32,13 +63,13 @@ impl SceneFragment{
     pub fn prepare(&mut self, file_name: &String) -> Result<(), u8>{
         let mut play_config: PlayConfig = vec![];
         match Self::read_config(file_name, &mut play_config){  //check if read the config file successfully
-            Err(e) => return Err(e),  //if not, return error
+            Err(_) => panic!("Thread panics in SceneFragment prepare"),  //if not, return error
             _ => {	//if yes, process the config file
 
                 match self.process_config(&play_config){  //check if config file process successfully
-                    Err(e) => return Err(e),  //if not, return error
+                    Err(_) => panic!("Thread panics in SceneFragment prepare"),  //if not, return error
                     _ => {  //else return Ok(())
-                        self.players.sort();  //sort the players based on their current lines
+                        self.players.sort_by(|p1,p2| cmp_player(&p1,&p2));  //sort the players based on their current lines
                         return Ok(()); 
                     }
                 }
@@ -53,11 +84,23 @@ impl SceneFragment{
         for element in config {	 //loop through the elements in config	
             match element {
                 (character_name, text_file) => {  //grab character name and their file names
-                    let mut player = Player::new(character_name);  //declare a new player
-                    match player.prepare(&text_file){  //call player's prepare function to grab player lines
-                        Err(e) => return Err(e),
-                        _ => {}
+                    let player = Arc::new(Mutex::new(Player::new(character_name)));  //declare a new player
+                    if let Ok(mut async_player) = player.lock(){
+                        //run prepare function from SceneFragment
+                        match async_player.prepare(&text_file){
+                            Err(e) => return Err(e),
+                            _ => {}
+                        }
                     }
+                    else{
+                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::prepare function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return Err(FAIL_CONCURRENCY);
+                    }
+
                     self.players.push(player);  //push the player to the vector
                 }
             }
@@ -120,22 +163,32 @@ impl SceneFragment{
                     continue;
                 }
 
-                let current_player = &mut self.players[player_index]; //set the current player
-                if current_player.lines[current_player.index].0 == order_tracking{  //if the player's next line number equal the current line number
-                    if line_spoken_flag == SPOKEN {  //if the line is already spoken
-                        if COMPLAIN.load(atomic::Ordering::SeqCst) {  //complain about duplicate lines
-                            let result = writeln!(std::io::stderr().lock(), "Character line \"{}\" duplicate", order_tracking);
-                            match result {
-                                Err(e) => println!("Writeln error with {e}"),
-                                _ => {}
+                if let Ok(ref mut current_player) = self.players[player_index].lock(){
+                    if current_player.lines[current_player.index].0 == order_tracking{  //if the player's next line number equal the current line number
+                        if line_spoken_flag == SPOKEN {  //if the line is already spoken
+                            if COMPLAIN.load(atomic::Ordering::SeqCst) {  //complain about duplicate lines
+                                let result = writeln!(std::io::stderr().lock(), "Character line \"{}\" duplicate", order_tracking);
+                                match result {
+                                    Err(e) => println!("Writeln error with {e}"),
+                                    _ => {}
+                                }
                             }
                         }
-                    }
 
-                    current_player.speak(&mut current_character);  //let player speak current line
-                    speaking_end_vec[player_index] = current_player.next_line();  //check if player has next line
-                    line_spoken_flag = 1;  //set line spoken flag to 1
+                        current_player.speak(&mut current_character);  //let player speak current line
+                        speaking_end_vec[player_index] = current_player.next_line();  //check if player has next line
+                        line_spoken_flag = 1;  //set line spoken flag to 1
+                    }
                 }
+                else{
+                    let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::recite function");
+                    match result {
+                        Err(e) => println!("Writeln error with {e}"),
+                        _ => {}
+                    }
+                    return;
+                }
+ 
             }
 
             if line_spoken_flag == 0 {  //if the line was not spoken
@@ -175,8 +228,8 @@ impl SceneFragment{
         }
 
         //grab previous players and new players
-        let new_player_list: Vec<String> = self.players.iter().map(|player| player.name.clone()).collect();
-        let prev_player_list: Vec<String> = prev_scene.players.iter().map(|player| player.name.clone()).collect();
+        let new_player_list: Vec<String> = self.players.iter().map(|player| player.lock().unwrap().name.clone()).collect();
+        let prev_player_list: Vec<String> = prev_scene.players.iter().map(|player| player.lock().unwrap().name.clone()).collect();
         for player in new_player_list{
             if !prev_player_list.contains(&player) {  //if a player is not in previous players, enter him/her
                 let result = writeln!(std::io::stdout().lock(), "[Enter {player}.]");
@@ -200,7 +253,7 @@ impl SceneFragment{
 
         //enter all the players
         for player in self.players.iter(){
-            let result = writeln!(std::io::stdout().lock(), "[Enter {}.]", player.name);
+            let result = writeln!(std::io::stdout().lock(), "[Enter {}.]", player.lock().unwrap().name);
             match result {
                 Err(e) => println!("Writeln error with {e}"),
                 _ => {}
@@ -210,8 +263,8 @@ impl SceneFragment{
 
     pub fn exit(&self, prev_scene: &SceneFragment){
         //grab previous players and new players
-        let prev_player_list: Vec<String> = self.players.iter().map(|player| player.name.clone()).collect();
-        let new_player_list: Vec<String> = prev_scene.players.iter().map(|player| player.name.clone()).collect();
+        let prev_player_list: Vec<String> = self.players.iter().map(|player| player.lock().unwrap().name.clone()).collect();
+        let new_player_list: Vec<String> = prev_scene.players.iter().map(|player| player.lock().unwrap().name.clone()).collect();
 
         //check backwards in previous players
         for player in prev_player_list.iter().rev(){
@@ -229,7 +282,7 @@ impl SceneFragment{
     pub fn exit_all(&self) {
         //exit players in reverse order
         for player in self.players.iter().rev(){
-            let result = writeln!(std::io::stdout().lock(), "[Exit {}.]", player.name);
+            let result = writeln!(std::io::stdout().lock(), "[Exit {}.]", player.lock().unwrap().name);
             match result {
                 Err(e) => println!("Writeln error with {e}"),
                 _ => {}

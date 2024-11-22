@@ -2,10 +2,11 @@ use crate::lab3::script_gen::grab_trimmed_file_lines;
 use crate::atomic;
 use crate::COMPLAIN;
 use crate::lab3::scene_fragment::SceneFragment;
-use super::declarations::FAIL_GENERATE_SCRIPT;
+use super::declarations::{FAIL_GENERATE_SCRIPT, FAIL_CONCURRENCY};
 
 use std::io::Write;
 use std::sync::{Arc, Mutex};
+use std::thread;
 
 const FIRST_FRAGMENT:usize = 0;
 const INDEXING: usize = 1;  //const for next and prev fragment index
@@ -72,6 +73,7 @@ impl Play{
     pub fn process_config(&mut self, config: &ScriptConfig) -> Result<(), u8>{
         let mut title: String = "".to_string();
 
+        let mut handles = vec![];
         for element in config {	 //loop through the elements in script config	
             match element {  //destruct tuples
                 (true, new_title) => {  //if bool is true, update title variable with new title
@@ -79,23 +81,24 @@ impl Play{
                 },
                 (false, text_file) => {  //if bool is false, create a new scenefragment
                     let fragment = Arc::new(Mutex::new(SceneFragment::new(&title)));
-                    
-                    if let Ok(mut async_fragment) =  fragment.lock(){
-                        //run prepare function from SceneFragment
-                        match async_fragment.prepare(&text_file){
-                            Err(e) => return Err(e),
-                            _ => {}
-                        }
-                    }
-                    else{
-                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
-                        match result {
-                            Err(e) => println!("Writeln error with {e}"),
-                            _ => {}
-                        }
-                        return Err(FAIL_GENERATE_SCRIPT);
-                    }
+                    let fragment_clone = Arc::clone(&fragment); // clone the Arc for use in the thread
 
+                    // run preparation in a new thread
+                    let new_text_file = text_file.clone();
+                    let child = thread::spawn(move || {
+                        if let Ok(mut async_fragment) = fragment_clone.lock() {
+                            async_fragment.prepare(&new_text_file)
+                        } else {
+                            let result = writeln!(std::io::stderr().lock(), "Failed to lock fragment in thread");
+                            if let Err(e) = result {
+                                println!("Writeln error: {}", e);
+                            }
+                            return Err(FAIL_CONCURRENCY);
+                        }
+
+                    });
+
+                    handles.push(child);
                     //push the new fragment to the play struct
                     self.fragments.push(fragment);
                     title = "".to_string(); //set title to empty again
@@ -103,6 +106,12 @@ impl Play{
             }
         }
 
+        for thread in handles{
+            match thread.join(){
+                Err(_) => return Err(FAIL_CONCURRENCY),
+                _ => {}
+            }
+        }
         
         Ok(())
     }
