@@ -58,9 +58,8 @@ impl Player{
     pub fn prepare(&mut self, text_file: &String) -> Result<(), u8>{
         let mut speaking_lines = Vec::<String>::new();
         match grab_trimmed_file_lines(text_file, &mut speaking_lines){  //check if grab trimmed lines from character file successfully
-            Err(e) => {  //if not, return error
-                return Err(e);
-            },
+            Err(_) => //if not, panic
+                panic!("Thread panics in Player prepare"),
             _ => {  //else, store the lines into player's lines				
                 for line in speaking_lines {
                     self.add_script_line(&line);						

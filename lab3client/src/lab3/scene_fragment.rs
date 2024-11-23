@@ -7,6 +7,7 @@ use crate::lab3::declarations::FAIL_CONCURRENCY;
 use std::io::Write;
 use std::cmp::Ordering;
 use std::sync::{Arc, Mutex};
+use std::thread;
 
 const CHARACTER: usize = 0;
 const CHARACTER_FILE: usize = 1;
@@ -81,28 +82,37 @@ impl SceneFragment{
     //process_config function
     //  process the lines in config file
     pub fn process_config(&mut self, config: &PlayConfig) -> Result<(), u8>{
+        let mut handles = vec![];
         for element in config {	 //loop through the elements in config	
             match element {
                 (character_name, text_file) => {  //grab character name and their file names
                     let player = Arc::new(Mutex::new(Player::new(character_name)));  //declare a new player
-                    if let Ok(mut async_player) = player.lock(){
-                        //run prepare function from SceneFragment
-                        match async_player.prepare(&text_file){
-                            Err(e) => return Err(e),
-                            _ => {}
+                    let player_clone = Arc::clone(&player); // clone the Arc for
+                    // run preparation in a new thread
+                    let new_text_file = text_file.clone();
+                    let child = thread::spawn(move || {
+                        if let Ok(mut async_player) = player_clone.lock() {
+                            async_player.prepare(&new_text_file)
+                        } else {
+                            let result = writeln!(std::io::stderr().lock(), "Failed to lock player in Scenefragment::process_config");
+                            if let Err(e) = result {
+                                println!("Writeln error: {}", e);
+                            }
+                            return Err(FAIL_CONCURRENCY);
                         }
-                    }
-                    else{
-                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::prepare function");
-                        match result {
-                            Err(e) => println!("Writeln error with {e}"),
-                            _ => {}
-                        }
-                        return Err(FAIL_CONCURRENCY);
-                    }
+                    });
 
+                    handles.push(child);
+                    //push the new fragment to the play struct
                     self.players.push(player);  //push the player to the vector
                 }
+            }
+        }
+
+        for thread in handles{
+            match thread.join(){
+                Err(_) => return Err(FAIL_CONCURRENCY),
+                _ => {}
             }
         }
 
