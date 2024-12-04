@@ -25,7 +25,7 @@ impl ReturnWrapper{
 impl Termination for ReturnWrapper{
     fn report(self) -> ExitCode{
         if self.val != 0 {
-            let result = writeln!(std::io::stderr().lock(), "Error: {}", self.val);
+            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Error: {}", self.val);
             match result {
                 Err(e) => println!("Writeln error with {e}"),
                 _ => {}

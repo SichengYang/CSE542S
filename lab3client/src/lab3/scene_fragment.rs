@@ -24,7 +24,7 @@ fn cmp_player(p1: &Arc<Mutex<Player>>, p2:&Arc<Mutex<Player>>) -> Ordering{
                 _ => return Ordering::Equal
             }
         }else{
-            let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::cmp function");
+            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in SceneFragment::cmp function");
             match result {
                 Err(e) => println!("Writeln error with {e}"),
                 _ => {}
@@ -32,7 +32,7 @@ fn cmp_player(p1: &Arc<Mutex<Player>>, p2:&Arc<Mutex<Player>>) -> Ordering{
             return Ordering::Equal;
         }
     }else{
-        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::cmp function");
+        let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in SceneFragment::cmp function");
         match result {
             Err(e) => println!("Writeln error with {e}"),
             _ => {}
@@ -94,7 +94,7 @@ impl SceneFragment{
                         if let Ok(mut async_player) = player_clone.lock() {
                             async_player.prepare(&new_text_file)
                         } else {
-                            let result = writeln!(std::io::stderr().lock(), "Failed to lock player in Scenefragment::process_config");
+                            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Failed to lock player in Scenefragment::process_config");
                             if let Err(e) = result {
                                 println!("Writeln error: {}", e);
                             }
@@ -125,7 +125,7 @@ impl SceneFragment{
         let v: Vec<&str> = line.split_whitespace().collect();  //store the strings into a vector	
         if v.len() != TOKEN_NUM{  //if it's not two strings
             if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
-                let result = writeln!(std::io::stderr().lock(), "Config file line \"{}\" length not equal to 2", line);
+                let result = writeln!(std::io::stderr().lock(), "\t --Warning: Config file line \"{}\" length not equal to 2", line);
                 match result {
                     Err(e) => println!("Writeln error with {e}"),
                     _ => {}
@@ -165,7 +165,7 @@ impl SceneFragment{
         let mut order_tracking = 0; // this is used to track whether every index is included, default start with 0
         
         // print everyone's dialog while someone still has dialog
-        while Self::player_still_have_dialog(&speaking_end_vec) {
+        while Self::player_still_have_dialog(&speaking_end_vec) && order_tracking < 100 {
             let mut line_spoken_flag = 0;
             for player_index in 0..self.players.len() {
                 //check if the current speaking match our order
@@ -177,7 +177,7 @@ impl SceneFragment{
                     if current_player.lines[current_player.index].0 == order_tracking{  //if the player's next line number equal the current line number
                         if line_spoken_flag == SPOKEN {  //if the line is already spoken
                             if COMPLAIN.load(atomic::Ordering::SeqCst) {  //complain about duplicate lines
-                                let result = writeln!(std::io::stderr().lock(), "Character line \"{}\" duplicate", order_tracking);
+                                let result = writeln!(std::io::stderr().lock(), "\t --Warning: Character line \"{}\" duplicate", order_tracking);
                                 match result {
                                     Err(e) => println!("Writeln error with {e}"),
                                     _ => {}
@@ -191,7 +191,7 @@ impl SceneFragment{
                     }
                 }
                 else{
-                    let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in SceneFragment::recite function");
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in SceneFragment::recite function");
                     match result {
                         Err(e) => println!("Writeln error with {e}"),
                         _ => {}
@@ -203,14 +203,48 @@ impl SceneFragment{
 
             if line_spoken_flag == 0 {  //if the line was not spoken
                 if COMPLAIN.load(atomic::Ordering::SeqCst) {  //complain about line missing
-                    let result = writeln!(std::io::stderr().lock(), "Character line \"{}\" missing", order_tracking);
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Character line \"{}\" missing", order_tracking);
                     match result {
                         Err(e) => println!("Writeln error with {e}"),
                         _ => {}
                     }
                 }
+                order_tracking += 1; // move to next speaking order
             }
-            order_tracking += 1; // move to next speaking order
+            else {
+                let mut has_duplicate_index = false;
+                for player_index in 0..self.players.len() {
+                    //check if the current speaking match our order
+                    if speaking_end_vec[player_index] == None {
+                        continue;
+                    }
+
+                    if let Ok(ref mut current_player) = self.players[player_index].lock(){
+                        if current_player.lines[current_player.index].0 == order_tracking{ // this means there are duplicate index
+                            has_duplicate_index = true;
+                            break;
+                        }
+                    }
+                    else {
+                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in SceneFragment::recite function");
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
+                        return; 
+                    }
+                }
+
+                if has_duplicate_index && COMPLAIN.load(atomic::Ordering::SeqCst) {
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Index line \"{}\" is found again", order_tracking);
+                    match result {
+                        Err(e) => println!("Writeln error with {e}"),
+                        _ => {}
+                    }
+                } else {
+                    order_tracking += 1; // increment only if there is no duplicate index
+                }
+            }
         }
     }
 

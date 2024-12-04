@@ -1,0 +1,15 @@
+cp ALL_macbeth_i_1.txt ALL_macbeth_i_1_mod.txt
+cp DUNCAN_macbeth_i_2a.txt DUNCAN_macbeth_i_2a_mod.txt
+cp DUNCAN_macbeth_i_2b.txt DUNCAN_macbeth_i_2b_mod.txt
+cp FIRST_WITCH_macbeth_i_1.txt FIRST_WITCH_macbeth_i_1_mod.txt
+cp LENNOX_macbeth_i_2b.txt LENNOX_macbeth_i_2b_mod.txt
+cp macbeth_i_1_config.txt macbeth_i_1_config_mod.txt
+cp macbeth_i_2a_config.txt macbeth_i_2a_config_mod.txt
+cp macbeth_i_2b_config.txt macbeth_i_2b_config_mod.txt
+cp MALCOLM_macbeth_i_2a.txt MALCOLM_macbeth_i_2a_mod.txt
+cp MALCOLM_macbeth_i_2b.txt MALCOLM_macbeth_i_2b_mod.txt
+cp partial_macbeth_act_i_script.txt partial_macbeth_act_i_script_mod.txt
+cp ROSS_macbeth_i_2b.txt ROSS_macbeth_i_2b_mod.txt
+cp SECOND_WITCH_macbeth_i_1.txt SECOND_WITCH_macbeth_i_1_mod.txt
+cp SOLDIER_macbeth_i_2a.txt SOLDIER_macbeth_i_2a_mod.txt
+cp THIRD_WITCH_macbeth_i_1.txt THIRD_WITCH_macbeth_i_1_mod.txt

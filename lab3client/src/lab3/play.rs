@@ -49,7 +49,7 @@ impl Play{
                 if !self.fragments.is_empty() && !first_fragment.title.is_empty(){
                     return Ok(());
                 }else{  //if not print out error message and return error code
-                    let result = writeln!(std::io::stderr().lock(), "Play prepare failed");
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Play prepare failed");
                     match result {
                         Err(e) => println!("Writeln error with {e}"),
                         _ => {}
@@ -58,7 +58,7 @@ impl Play{
                 }
             }
             _ => {
-                let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                 match result {
                     Err(e) => println!("Writeln error with {e}"),
                     _ => {}
@@ -89,7 +89,7 @@ impl Play{
                         if let Ok(mut async_fragment) = fragment_clone.lock() {
                             async_fragment.prepare(&new_text_file)
                         } else {
-                            let result = writeln!(std::io::stderr().lock(), "Failed to lock fragment in thread");
+                            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Failed to lock fragment in thread");
                             if let Err(e) = result {
                                 println!("Writeln error: {}", e);
                             }
@@ -126,7 +126,7 @@ impl Play{
         if v[FIRST_TOKEN]=="[scene]" { //if the first token is scene
             if v.len() == ONE_TOKEN{  //if the line only has [scene]
                 if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
-                    let result = writeln!(std::io::stderr().lock(), "Config file line \"{}\" missing scene title", line);
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Config file line \"{}\" missing scene title", line);
                     match result {
                         Err(e) => println!("Writeln error with {e}"),
                         _ => {}
@@ -145,7 +145,7 @@ impl Play{
         }else{
             if v.len() > ONE_TOKEN{  //if the first token is not [scene] and it's more than one token
                 if COMPLAIN.load(atomic::Ordering::SeqCst) {  //if complain is set, complain about the line				
-                    let result = writeln!(std::io::stderr().lock(), "Config file line \"{}\" has extra tokens", line);
+                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: Config file line \"{}\" has extra tokens", line);
                     match result {
                         Err(e) => println!("Writeln error with {e}"),
                         _ => {}
@@ -164,7 +164,7 @@ impl Play{
         let mut lines:Vec<String> = Vec::new();
         match grab_trimmed_file_lines(file_name, &mut lines){  //check if lines are extracted successfully
             Err(e) => { //if not, return error
-                let result = writeln!(std::io::stderr().lock(), "Invalid file name: {}", file_name);
+                let result = writeln!(std::io::stderr().lock(), "\t --Warning: Invalid file name: {}", file_name);
                 match result {
                     Err(e) => println!("Writeln error with {e}"),
                     _ => {}
@@ -196,7 +196,7 @@ impl Play{
                         }
                         fragment.exit(next_fragment);
                     } else {
-                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                         match result {
                             Err(e) => println!("Writeln error with {e}"),
                             _ => {}
@@ -219,7 +219,7 @@ impl Play{
                             _ => {}
                         }
                     }else {
-                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                         match result {
                             Err(e) => println!("Writeln error with {e}"),
                             _ => {}
@@ -243,7 +243,7 @@ impl Play{
                                 _ => {}
                             }
                         }else{
-                            let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                             match result {
                                 Err(e) => println!("Writeln error with {e}"),
                                 _ => {}
@@ -251,7 +251,7 @@ impl Play{
                             return;   
                         }
                     } else {
-                        let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                         match result {
                             Err(e) => println!("Writeln error with {e}"),
                             _ => {}
@@ -261,7 +261,7 @@ impl Play{
                 }
             }
             else{
-                let result = writeln!(std::io::stderr().lock(), "Concurrency Hazard in play::prepare function");
+                let result = writeln!(std::io::stderr().lock(), "\t --Warning: Concurrency Hazard in play::prepare function");
                 match result {
                     Err(e) => println!("Writeln error with {e}"),
                     _ => {}

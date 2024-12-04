@@ -85,7 +85,7 @@ impl Player{
                     Ok(speaking_order) => self.lines.push((speaking_order, rest_of_line_trim.to_string())),  //if yes, add to player's lines
                     Err(_) => {  //if not and if complain is set, complain about the first token
                         if COMPLAIN.load(atomic::Ordering::SeqCst) {				
-                            let result = writeln!(std::io::stderr().lock(), "Token {} does not represent a value in usize", first_token_trim);
+                            let result = writeln!(std::io::stderr().lock(), "\t --Warning: Token {} does not represent a value in usize", first_token_trim);
                             match result {
                                 Err(e) => println!("Writeln error with {e}"),
                                 _ => {}

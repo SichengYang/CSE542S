@@ -14,7 +14,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 			f
 		},
 		Err(_) => {  //if not, print message and return error
-			let result = writeln!(std::io::stderr().lock(), "{} is not a valid filename", filename);
+			let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} is not a valid filename", filename);
 			match result {
 				Err(e) => println!("Writeln error with {e}"),
 				_ => {}
@@ -34,7 +34,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 				lines.push(buffer.trim().to_string());	//add the trimmed line to lines
 			},
 			Err(_) => {  //if returned error, print message and return error
-				let result = writeln!(std::io::stderr().lock(), "This file cannot be read");
+				let result = writeln!(std::io::stderr().lock(), "\t --Warning: This file cannot be read");
 				match result {
 					Err(e) => println!("Writeln error with {e}"),
 					_ => {}
