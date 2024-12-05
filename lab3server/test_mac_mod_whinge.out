@@ -1,0 +1,117 @@
+Config file line "macbeth_i_1_config_mod.txt  STILL MORE EXTRA TOKENS" has extra tokens
+Config file line "ALL ALL_macbeth_i_1_mod.txt  THESE ARE EXTRA TOKENS" length not equal to 2
+Token NAN does not represent a value in usize
+Config file line "" length not equal to 2
+Config file line "ROSS ROSS_macbeth_i_2b_mod.txt  THESE ARE MORE EXTRA TOKENS" length not equal to 2
+Macbeth ACT I SCENE I An open Place Thunder and Lightning by William Shakespeare 
+[Enter FIRST_WITCH.]
+[Enter SECOND_WITCH.]
+[Enter THIRD_WITCH.]
+[Enter ALL.]
+Character line "0" missing
+
+FIRST_WITCH
+When shall we three meet again?
+In thunder, lightning, or in rain?
+
+SECOND_WITCH
+When the hurlyburly's done,
+When the battle's lost and won.
+
+THIRD_WITCH
+That will be ere the set of sun.
+
+FIRST_WITCH
+Where the place?
+
+SECOND_WITCH
+Upon the heath.
+
+THIRD_WITCH
+There to meet with Macbeth.
+
+FIRST_WITCH
+I come, Graymalkin!
+
+ALL
+Paddock calls:--anon:--
+Fair is foul, and foul is fair:
+Hover through the fog and filthy air.
+
+[Exit ALL.]
+[Exit THIRD_WITCH.]
+[Exit SECOND_WITCH.]
+[Exit FIRST_WITCH.]
+Macbeth ACT I SCENE II A Camp near Forres by William Shakespeare 
+[Enter DUNCAN.]
+[Enter MALCOLM.]
+[Enter SOLDIER.]
+Character line "0" missing
+
+DUNCAN
+What bloody man is that? He can report,
+As seemeth by his plight, of the revolt
+The newest state.
+
+MALCOLM
+This is the sergeant
+Who, like a good and hardy soldier, fought
+'Gainst my captivity.--Hail, brave friend!
+Say to the king the knowledge of the broil
+As thou didst leave it.
+
+SOLDIER
+Doubtful it stood;
+As two spent swimmers that do cling together
+And choke their art. The merciless Macdonwald,--
+Character line "12" missing
+Worthy to be a rebel,--for to that
+Character line "14" missing
+Character line "15" missing
+Character line "16" missing
+Character line "17" missing
+Character line "18" missing
+Character line "19" missing
+Character line "20" missing
+Character line "21" missing
+Character line "22" missing
+Character line "23" missing
+Character line "24" missing
+Character line "25" missing
+
+DUNCAN
+O valiant cousin! worthy gentleman!
+Character line "27" missing
+Character line "28" missing
+Character line "29" missing
+Character line "30" missing
+Character line "31" missing
+Character line "32" missing
+Character line "33" missing
+Character line "34" missing
+Character line "35" missing
+Dismay'd not this
+Our captains, Macbeth and Banquo?
+Character line "38" missing
+Character line "39" missing
+Character line "40" missing
+Character line "41" missing
+Character line "42" missing
+Character line "43" missing
+Character line "44" missing
+Character line "45" missing
+Character line "46" missing
+Character line "47" missing
+So well thy words become thee as thy wounds;
+They smack of honor both.--Go, get him surgeons.
+Who comes here?
+Character line "51" missing
+Character line "52" missing
+Character line "53" missing
+Character line "54" missing
+Character line "55" missing
+Character line "56" missing
+Character line "57" missing
+Character line "58" missing
+Character line "59" missing
+... and so on until Ctrl-C
