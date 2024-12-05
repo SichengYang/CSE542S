@@ -123,6 +123,9 @@ impl Server{
                                                         return;
                                                     },
                                                     Ok(data) => {
+                                                        if data.is_empty() {
+                                                            return;
+                                                        }
                                                         data
                                                     }
                                                 };

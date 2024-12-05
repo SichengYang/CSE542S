@@ -39,7 +39,7 @@ fn main() -> Result<(), u8> {
 
             let mut reader = BufReader::new(&connection);
             let mut response = String::new();
-            while let Ok(size) = reader.read_line(&mut response) {
+            if let Ok(size) = reader.read_line(&mut response) {
                 println!("Read a line with {size} bytes: \"{response}\" from server");
             }
         }
