@@ -1,5 +1,5 @@
 use std::env;
-use std::io::{BufRead, BufReader, Read, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
 use std::thread::sleep;
 use std::time::Duration;
@@ -7,8 +7,6 @@ use std::time::Duration;
 const REQUIRED_ARGS: usize = 3;
 const ADDRESS: usize = 1;
 const TOKEN: usize = 2;
-const BUFFER_INITIAL: u8 = 0;
-const BUFFER_SIZE: usize = 1024;
 const ONE_SECOND: u64 = 1;
 
 const INCORRECT_ARGS_NUM: u8 = 1;
