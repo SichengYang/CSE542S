@@ -3,7 +3,7 @@
 // This file contains the definitions of server. It will recieve the request from client and server requested file
 
 // import field
-use std::net::{TcpListener, Shutdown};
+use std::net::{Shutdown, SocketAddr, TcpListener, TcpStream};
 use regex::Regex;
 use std::fs;
 use std::fs::File;
@@ -68,7 +68,7 @@ impl Server{
                 Some(valid_listener) => {
                     let request = valid_listener.accept();
                     match request { // the expect will not happen because we have checked
-                        Ok((mut socket, _addr)) => {
+                        Ok((mut socket, addr)) => {
                             if CANCEL_FLAG.load(SeqCst) {
                                 return;
                             }
@@ -77,7 +77,7 @@ impl Server{
                                 let mut buffer = [BUFFER_INITIAL; BUFFER_SIZE];
                                 match socket.read(&mut buffer){
                                     Err(_) => {
-                                        let result = writeln!(std::io::stderr().lock(), "read error with {_addr}");
+                                        let result = writeln!(std::io::stderr().lock(), "read error with {addr}");
 
                                         match result {
                                             Err(write_e) => println!("Writeln error with {write_e:?}"),
@@ -90,10 +90,9 @@ impl Server{
                                         if body=="quit" {
                                             CANCEL_FLAG.store(true, SeqCst);
                                         }else{
-
                                             let filename = body.to_string();
                                             let re = Regex::new(r"[\$\\/]|(\.\.)").unwrap();
-                                            if re.is_match(filename){
+                                            if re.is_match(&filename){
                                                 return;
                                             }
 
@@ -111,37 +110,31 @@ impl Server{
                                                     return;
                                                 }
                                             };
-                                            let buffer = match fs::read(filename){
-                                                Err(_) => {
-                                                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} is not a valid filename", filename);
-                                                    match result {
-                                                        Err(e) => println!("Writeln error with {e}"),
-                                                        _ => {}
+
+                                            loop{
+                                                let buffer = match fs::read(filename.clone()){
+                                                    Err(_) => {
+                                                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} cannot be read", filename.clone());
+                                                        match result {
+                                                            Err(e) => println!("Writeln error with {e}"),
+                                                            _ => {}
+                                                        }
+                                                        
+                                                        return;
+                                                    },
+                                                    Ok(data) => {
+                                                        data
                                                     }
-                                                    
-                                                    return;
-                                                },
-                                                (data) => {
-                                                    data
-                                                }
+                                                };
+
+                                                respond_to_socket(&mut socket, &addr, 200, &buffer);
                                             }
+                                            
 
 
                                         }
 
                                         
-                                        let response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
-                                        match socket.write_all(response.as_bytes()) {
-                                            Err(_) => {
-                                                let result = writeln!(std::io::stderr().lock(), "response write error with {_addr}");
-
-                                                match result {
-                                                    Err(write_e) => println!("Writeln error with {write_e:?}"),
-                                                    _ => {}
-                                                }
-                                            },
-                                            Ok(_) => {}
-                                        };
                                     }
                                 }
                             });
@@ -161,11 +154,11 @@ impl Server{
     }
 }
 
-fn respondToSocket(){
-    let response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+fn respond_to_socket(socket: & mut TcpStream, addr: &SocketAddr, response_num: usize, buffer: &Vec<u8>){
+    let response: String = format!("HTTP/1.1 {}\r\n{:?}", response_num, buffer);
     match socket.write_all(response.as_bytes()) {
         Err(_) => {
-            let result = writeln!(std::io::stderr().lock(), "response write error with {_addr}");
+            let result = writeln!(std::io::stderr().lock(), "Server response write error with {addr}");
 
             match result {
                 Err(write_e) => println!("Writeln error with {write_e:?}"),

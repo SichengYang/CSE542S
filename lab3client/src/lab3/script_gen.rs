@@ -1,8 +1,8 @@
 use super::declarations::FAIL_GENERATE_SCRIPT;
+use super::declarations::FAIL_CONNECTION;
 use std::fs::File;
-use std::io::BufReader;
-use std::io::BufRead;
-use std::io::Write;
+use std::io::{BufReader, BufRead, Write};
+use std::net::TcpStream;
 
 const END_OF_FILE: usize = 0;
 
@@ -44,4 +44,42 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 		}	
 	}
 	
+}
+
+
+pub fn get_buffered_reader(message: &String) -> Result<BufReader<TcpStream>, u8> {
+    if let Some(addr) = message.strip_prefix("net:") {
+        let addr: Vec<&str> = message.splitn(3, ':').collect();
+        if addr.len() == 3 {
+            let addr_port = addr[0].to_string() + ":" + addr[1];
+            let file_name = addr[2];
+
+            match TcpStream::connect(&addr_port) {
+                Ok(mut stream) => {
+                    match stream.write_all(file_name.as_bytes()){
+						Err(_) => {
+							let result = writeln!(std::io::stderr().lock(), "Client response write error with {addr}");
+				
+							match result {
+								Err(write_e) => println!("Writeln error with {write_e:?}"),
+								_ => {}
+							}
+						},
+						Ok(_) => {}
+					}
+
+					let reader = BufReader::new(stream);
+                    return Ok(reader);
+                }
+                Err(e) => {
+                    return Err(FAIL_CONNECTION);
+                }
+            }
+        }
+    }
+
+    match File::open(message) {
+        Ok(file) => Ok(BufReader::new(Box::new(file))),
+        Err(e) => Err(e),
+    }
 }
