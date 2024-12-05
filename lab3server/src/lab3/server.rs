@@ -6,7 +6,6 @@
 use std::net::{Shutdown, SocketAddr, TcpListener, TcpStream};
 use regex::Regex;
 use std::fs;
-use std::fs::File;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::Ordering::SeqCst;
 use std::thread;
@@ -60,11 +59,11 @@ impl Server{
         loop {
             // detect the stop point of server
             if CANCEL_FLAG.load(SeqCst) {
-                return;
+                break;
             }
             
             match &self.listener {
-                None => return,
+                None => break,
                 Some(valid_listener) => {
                     let request = valid_listener.accept();
                     match request { // the expect will not happen because we have checked
@@ -89,59 +88,43 @@ impl Server{
                                         println!("Received: {}", body);
                                         if body=="quit" {
                                             CANCEL_FLAG.store(true, SeqCst);
-                                        }else{
+                                            let result = writeln!(std::io::stderr().lock(), "set cancel flag to {}", CANCEL_FLAG.load(SeqCst));
+                                            
+                                            match result {
+                                                Err(write_e) => println!("Writeln error with {write_e:?}"),
+                                                _ => {}
+                                            }
+                                        }
+                                        else{
                                             let filename = body.to_string();
                                             let re = Regex::new(r"[\$\\/]|(\.\.)").unwrap();
                                             if re.is_match(&filename){
                                                 return;
                                             }
 
-                                            let file = match File::open(filename.clone()) {  //check if the file opens successfully
-                                                Ok(f) => {  //if yes, store file
-                                                    f
-                                                },
-                                                Err(_) => {  //if not, print message and return error
-                                                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} is not a valid filename", filename);
+                                            let buffer = match fs::read(filename.clone()){
+                                                Err(_) => {
+                                                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} cannot be read", filename.clone());
                                                     match result {
                                                         Err(e) => println!("Writeln error with {e}"),
                                                         _ => {}
                                                     }
                                                     socket.shutdown(Shutdown::Both).expect("Shutdown failed");
                                                     return;
+                                                },
+                                                Ok(data) => {
+                                                    data
                                                 }
                                             };
 
-                                            loop{
-                                                let buffer = match fs::read(filename.clone()){
-                                                    Err(_) => {
-                                                        let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} cannot be read", filename.clone());
-                                                        match result {
-                                                            Err(e) => println!("Writeln error with {e}"),
-                                                            _ => {}
-                                                        }
-                                                        
-                                                        return;
-                                                    },
-                                                    Ok(data) => {
-                                                        if data.is_empty() {
-                                                            return;
-                                                        }
-                                                        data
-                                                    }
-                                                };
-
-                                                respond_to_socket(&mut socket, &addr, 200, &buffer);
-                                            }
-                                            
-
-
+                                            respond_to_socket(&mut socket, &addr, 200, &buffer);
+                                            socket.shutdown(Shutdown::Both).expect("Shutdown failed");
+                                            return;
                                         }
-
-                                        
                                     }
                                 }
                             });
-                        }
+                        },
                         Err(network_e) => {
                             let result = writeln!(std::io::stderr().lock(), "Connection error with {network_e:?}");
 
@@ -158,7 +141,8 @@ impl Server{
 }
 
 fn respond_to_socket(socket: & mut TcpStream, addr: &SocketAddr, response_num: usize, buffer: &Vec<u8>){
-    let response: String = format!("HTTP/1.1 {}\r\n{:?}", response_num, buffer);
+    let response: String = format!("HTTP/1.1 {}\r\n{}", response_num, String::from_utf8_lossy(buffer));
+    println!("{response}");
     match socket.write_all(response.as_bytes()) {
         Err(_) => {
             let result = writeln!(std::io::stderr().lock(), "Server response write error with {addr}");

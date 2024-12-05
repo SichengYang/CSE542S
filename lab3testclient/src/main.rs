@@ -21,7 +21,7 @@ fn main() -> Result<(), u8> {
         return Err(INCORRECT_ARGS_NUM);
     }
 
-    let mut stream = TcpStream::connect(cmd_args[ADDRESS].clone());
+    let stream = TcpStream::connect(cmd_args[ADDRESS].clone());
 
     match stream {
         Err(_) => {
@@ -37,17 +37,27 @@ fn main() -> Result<(), u8> {
                 return Err(WRITE_FAILED);
             }
 
-            let mut reader = BufReader::new(&connection);
-            let mut response = String::new();
-            if let Ok(size) = reader.read_line(&mut response) {
-                println!("Read a line with {size} bytes: \"{response}\" from server");
+            // Wrap the stream in a BufReader
+            let reader = BufReader::new(connection);
+
+            // Read lines from the server
+            for line in reader.lines() {
+                match line {
+                    Ok(line) => {
+                        println!("Received: {}", line);
+                    }
+                    Err(e) => {
+                        eprintln!("Error reading from server: {}", e);
+                        break;
+                    }
+                }
             }
         }
     }
 
-    stream = TcpStream::connect(cmd_args[ADDRESS].clone());
+    let quit_stream = TcpStream::connect(cmd_args[ADDRESS].clone());
 
-    match stream {
+    match quit_stream {
         Err(_) => {
             println!("Connection failed with {}", cmd_args[ADDRESS]);
             return Err(CONNECTION_FAILED);
@@ -62,13 +72,15 @@ fn main() -> Result<(), u8> {
         }
     }
 
+    println!("Wait for one second");
     let wait = Duration::from_secs(ONE_SECOND);
     sleep(wait);
 
-    stream = TcpStream::connect(cmd_args[ADDRESS].clone());
-    match stream {
-        Err(_) => println!("Server shutdown successfully"),
-        _ => println!("Server is still running"),
+    let check_stream = TcpStream::connect(cmd_args[ADDRESS].clone());
+
+    match check_stream {
+        Err(_) => println!("Connection Failed"),
+        _ => println!("Wake the server out of accept method. Server should shutdown now."),
     }
 
     return Ok(());
