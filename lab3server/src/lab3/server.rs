@@ -85,15 +85,10 @@ impl Server{
                                     },
                                     Ok(bytes_read) => {
                                         let body = String::from_utf8_lossy(&buffer[..bytes_read]);
-                                        println!("Received: {}", body);
+                                        println!("Received: {} from {}", body, addr);
+                                        
                                         if body=="quit" {
                                             CANCEL_FLAG.store(true, SeqCst);
-                                            let result = writeln!(std::io::stderr().lock(), "set cancel flag to {}", CANCEL_FLAG.load(SeqCst));
-                                            
-                                            match result {
-                                                Err(write_e) => println!("Writeln error with {write_e:?}"),
-                                                _ => {}
-                                            }
                                         }
                                         else{
                                             let filename = body.to_string();
@@ -142,7 +137,6 @@ impl Server{
 
 fn respond_to_socket(socket: & mut TcpStream, addr: &SocketAddr, response_num: usize, buffer: &Vec<u8>){
     let response: String = format!("HTTP/1.1 {}\r\n{}", response_num, String::from_utf8_lossy(buffer));
-    println!("{response}");
     match socket.write_all(response.as_bytes()) {
         Err(_) => {
             let result = writeln!(std::io::stderr().lock(), "Server response write error with {addr}");
