@@ -1,7 +1,8 @@
 use super::declarations::FAIL_GENERATE_SCRIPT;
 use super::declarations::FAIL_CONNECTION;
+use super::declarations::FAIL_OPEN_FILE;
 use std::fs::File;
-use std::io::{BufReader, BufRead, Write};
+use std::io::{BufReader, BufRead, Write, Read};
 use std::net::TcpStream;
 
 const END_OF_FILE: usize = 0;
@@ -23,7 +24,10 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 		}
 	};
 
-	let mut reader = BufReader::new(file);  //create bufreader to read from file
+	let mut reader = match get_buffered_reader(filename){//create bufreader to read from file
+		Ok(reader) => reader,
+		Err(e) => return Err(e)
+	};
 	let mut buffer = String::new();  //create buffer to store strings
 
 	loop {
@@ -47,7 +51,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 }
 
 
-pub fn get_buffered_reader(message: &String) -> Result<BufReader<TcpStream>, u8> {
+pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>, u8> {
     if let Some(addr) = message.strip_prefix("net:") {
         let addr: Vec<&str> = message.splitn(3, ':').collect();
         if addr.len() == 3 {
@@ -58,7 +62,7 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<TcpStream>, u8>
                 Ok(mut stream) => {
                     match stream.write_all(file_name.as_bytes()){
 						Err(_) => {
-							let result = writeln!(std::io::stderr().lock(), "Client response write error with {addr}");
+							let result = writeln!(std::io::stderr().lock(), "Client response write error with {addr_port}");
 				
 							match result {
 								Err(write_e) => println!("Writeln error with {write_e:?}"),
@@ -68,7 +72,7 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<TcpStream>, u8>
 						Ok(_) => {}
 					}
 
-					let reader = BufReader::new(stream);
+					let reader = BufReader::new(Box::new(stream) as Box<dyn Read>);
                     return Ok(reader);
                 }
                 Err(e) => {
@@ -79,7 +83,7 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<TcpStream>, u8>
     }
 
     match File::open(message) {
-        Ok(file) => Ok(BufReader::new(Box::new(file))),
-        Err(e) => Err(e),
+        Ok(file) => {return Ok(BufReader::new(Box::new(file) as Box<dyn Read>));} ,
+        Err(e) => {return Err(FAIL_OPEN_FILE);}
     }
 }
