@@ -17,7 +17,7 @@ const SERVER_START_FAILED: bool = false;
 const BUFFER_SIZE: usize = 128;
 const BUFFER_INITIAL: u8 = 0;
 const HTTP_SUCCESS: usize = 200;
-const BODY_READ_ERROR: usize = 400;
+const INTERNAL_SERVER_ERROR: usize = 400;
 
 static CANCEL_FLAG: AtomicBool = AtomicBool::new(false);
 
@@ -79,7 +79,7 @@ impl Server{
                                 match socket.read(&mut buffer){
                                     Err(_) => {
                                         let message: Vec<u8> = Vec::from("Server message: Failed to process request content".as_bytes());
-                                        respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
+                                        respond_to_socket(&mut socket, &addr, INTERNAL_SERVER_ERROR, &message);
                                     },
                                     Ok(bytes_read) => {
                                         let body = String::from_utf8_lossy(&buffer[..bytes_read]);
@@ -93,14 +93,14 @@ impl Server{
                                             let re = Regex::new(r"[\$\\/]|(\.\.)").unwrap();
                                             if re.is_match(&filename){
                                                 let message: Vec<u8> = Vec::from("Server message: $, /, \\, and .. is not permited".as_bytes());
-                                                respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
+                                                respond_to_socket(&mut socket, &addr, INTERNAL_SERVER_ERROR, &message);
                                                 return;
                                             }
 
                                             let buffer = match fs::read(filename.clone()){
                                                 Err(_) => {
                                                     let message: Vec<u8> = Vec::from(format!("Server message: File {filename} cannot be read").as_bytes());
-                                                    respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
+                                                    respond_to_socket(&mut socket, &addr, INTERNAL_SERVER_ERROR, &message);
                                                     return;
                                                 },
                                                 Ok(data) => {
