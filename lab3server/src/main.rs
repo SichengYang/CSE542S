@@ -1,3 +1,9 @@
+//File Name: main.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains the driver of server. The server will recieve the request from clients and response
+// associate file content.
+
 pub mod lab3;
 use lab3::return_wrapper::ReturnWrapper;
 use lab3::server::Server;

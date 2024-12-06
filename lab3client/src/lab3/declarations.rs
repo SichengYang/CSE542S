@@ -1,7 +1,7 @@
-//File Name: 
+//File Name: declarations.rs
 //Authors: Qinzhou(Nick) Song, Sicheng Yang
 //Email: qinzhounick@wustl.edu, sichenng@wustl.edu
-//Summary: This file contains constants that needed. It includes constants that program return and 
+//Summary: This file contains constants that needed. It includes constants that program return and some general constants
 
 use std::sync::atomic;
 

@@ -1,3 +1,9 @@
+//File Name: return_wrapper.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains the definition of ReturnWrapper. It can help us to have
+// a cleaner return value structure
+
 use std::process::ExitCode;
 use std::process::Termination;
 use std::io::Write;

@@ -1,3 +1,8 @@
+//File Name: script_gen.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains the helper funtion to get the reader either from local file or online protocal
+
 use super::declarations::*;
 
 use std::fs::File;

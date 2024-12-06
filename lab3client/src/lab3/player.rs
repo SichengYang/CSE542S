@@ -1,3 +1,9 @@
+//File Name: player.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains the definition of all players. Each player know speak their current content, track
+// the speaking order, implement PartialOrd so that they can be sorted by speaking order
+
 use crate::atomic;
 use crate::COMPLAIN;
 use crate::lab3::script_gen::grab_trimmed_file_lines;

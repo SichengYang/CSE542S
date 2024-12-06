@@ -1,14 +1,21 @@
+//File Name: main.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This is a test drriver to test if server can response the file content and shutdown normally.
+
 use std::env;
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
 use std::thread::sleep;
 use std::time::Duration;
 
+// constants
 const REQUIRED_ARGS: usize = 3;
 const ADDRESS: usize = 1;
 const TOKEN: usize = 2;
 const ONE_SECOND: u64 = 1;
 
+// return value
 const INCORRECT_ARGS_NUM: u8 = 1;
 const CONNECTION_FAILED: u8 = 2;
 const WRITE_FAILED: u8 = 3;

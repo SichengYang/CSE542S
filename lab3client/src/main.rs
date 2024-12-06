@@ -1,3 +1,9 @@
+//File Name: main.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains all the driver of the client. It can generate the story with provided
+// configuration file either local or online.
+
 pub mod lab3;
 use lab3::declarations::COMPLAIN;
 use lab3::declarations::FAIL_BAD_COMMANDLINE;

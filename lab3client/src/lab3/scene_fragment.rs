@@ -1,3 +1,9 @@
+//File Name: scene_fragment.rs
+//Authors: Qinzhou(Nick) Song, Sicheng Yang
+//Email: qinzhounick@wustl.edu, sichenng@wustl.edu
+//Summary: This file contains the definition of SceneFragment. Each scene knows the title and its players.
+// Could be used by prepare() and recite() 
+
 use crate::atomic;
 use crate::lab3::declarations::FAIL_CONCURRENCY;
 use crate::lab3::player::Player;
