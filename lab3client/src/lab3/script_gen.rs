@@ -39,7 +39,9 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
     }
 }
 
+// This function get the reader either from file or remote
 pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>, u8> {
+    // check if it is a remote request
     if let Some(addr) = message.strip_prefix("net:") {
         let link: Vec<&str> = addr.splitn(TOTAL_PARTS, ':').collect();
         if link.len() == TOTAL_PARTS {
@@ -48,6 +50,7 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>,
 
             match TcpStream::connect(&addr_port) {
                 Ok(mut stream) => {
+                    // send request with filename
                     match stream.write_all(file_name.as_bytes()) {
                         Err(_) => {
                             let result = writeln!(
@@ -63,14 +66,18 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>,
                         Ok(_) => {}
                     }
 
+                    // receive file from server
                     let mut reader = BufReader::new(Box::new(stream) as Box<dyn Read>);
                     let mut status = String::new();
+
+                    // check if the request is a successful by read the header
                     match reader.read_line(&mut status) {
                         Err(_) => return Err(INTERNET_ERROR), // The response must have a status code or the internet is not stable
                         Ok(_) => {
                             if status.trim() == SUCCESS_MESSAGE.to_string() {
                                 return Ok(reader);
                             } else {
+                                // print the error message from server
                                 let mut error_content = String::new();
                                 if let Ok(_) = reader.read_line(&mut error_content) {
                                     let result = writeln!(
@@ -95,7 +102,7 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>,
         } else {
             return Err(INVALID_ADDR);
         }
-    } else {
+    } else { // open local file if it is not a remote request
         match File::open(message) {
             Ok(file) => {
                 return Ok(BufReader::new(Box::new(file) as Box<dyn Read>));

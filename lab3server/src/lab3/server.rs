@@ -27,7 +27,7 @@ pub struct Server {
 }
 
 impl Server {
-    //
+    // default listener to None and address to empty string
     pub fn new() -> Self {
         Self {
             listener: None,
@@ -35,7 +35,7 @@ impl Server {
         }
     }
 
-    //
+    //check if listner is open, return true if open, false otherwise
     pub fn is_open(&self) -> bool {
         match self.listener {
             None => return false,
@@ -43,7 +43,7 @@ impl Server {
         }
     }
 
-    //
+    //set up the server with provided address
     pub fn open(&mut self, address: &str) -> bool {
         let listener = TcpListener::bind(address);
 
@@ -57,6 +57,7 @@ impl Server {
         }
     }
 
+    // always run the server until receive the quit command
     pub fn run(&self) {
         loop {
             // detect the stop point of server
@@ -64,6 +65,7 @@ impl Server {
                 break;
             }
 
+            // check if the listener is None
             match &self.listener {
                 None => break,
                 Some(valid_listener) => {
@@ -71,11 +73,14 @@ impl Server {
                     match request {
                         // the expect will not happen because we have checked
                         Ok((mut socket, addr)) => {
+                            // we should check if the server is stopped, will not continue if detected
                             if CANCEL_FLAG.load(SeqCst) {
                                 return;
                             }
 
+                            // spawn a thread to handle the request
                             let _handle = thread::spawn(move || {
+                                // read the filename from request
                                 let mut buffer = [BUFFER_INITIAL; BUFFER_SIZE];
                                 match socket.read(&mut buffer) {
                                     Err(_) => {
@@ -97,6 +102,7 @@ impl Server {
                                         if body == "quit" {
                                             CANCEL_FLAG.store(true, SeqCst);
                                         } else {
+                                            //check if the request have illegal characters
                                             let filename = body.to_string();
                                             let re = Regex::new(r"[\$\\/]|(\.\.)").unwrap();
                                             if re.is_match(&filename) {
@@ -110,6 +116,7 @@ impl Server {
                                                 return;
                                             }
 
+                                            // read the requested file content
                                             let buffer = match fs::read(filename.clone()) {
                                                 Err(_) => {
                                                     let message: Vec<u8> = Vec::from(format!("Server message: File {filename} cannot be read").as_bytes());
@@ -154,12 +161,8 @@ impl Server {
     }
 }
 
-fn respond_to_socket(
-    socket: &mut TcpStream,
-    addr: &SocketAddr,
-    response_num: usize,
-    buffer: &Vec<u8>,
-) {
+// This function will send the message back to cilent with a header and a associate content
+fn respond_to_socket(socket: &mut TcpStream, addr: &SocketAddr, response_num: usize, buffer: &Vec<u8>) {
     let response: String = format!(
         "HTTP/1.1 {}\r\n{}",
         response_num,

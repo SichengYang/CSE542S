@@ -17,7 +17,7 @@ fn main() -> Result<(), u8> {
     let cmd_args: Vec<String> = env::args().collect();
 
     if cmd_args.len() != REQUIRED_ARGS {
-        println!("THis program requires 3 arguments");
+        println!("THis program requires 2 extra arguments <address> and <filename>");
         return Err(INCORRECT_ARGS_NUM);
     }
 
@@ -29,6 +29,7 @@ fn main() -> Result<(), u8> {
             return Err(CONNECTION_FAILED);
         }
         Ok(mut connection) => {
+            // request a file
             let write_content = cmd_args[TOKEN].clone();
             if let Ok(size) = connection.write(write_content.as_bytes()) {
                 println!("Write {size} bytes to stream: {write_content}");
@@ -37,10 +38,9 @@ fn main() -> Result<(), u8> {
                 return Err(WRITE_FAILED);
             }
 
-            // Wrap the stream in a BufReader
             let reader = BufReader::new(connection);
 
-            // Read lines from the server
+            // Read lines from the server and print them line by line
             for line in reader.lines() {
                 match line {
                     Ok(line) => {
@@ -63,6 +63,7 @@ fn main() -> Result<(), u8> {
             return Err(CONNECTION_FAILED);
         }
         Ok(mut connection) => {
+            //send quit command to server
             if let Ok(size) = connection.write("quit".as_bytes()) {
                 println!("Write {size} bytes to stream to quit");
             } else {
@@ -76,11 +77,12 @@ fn main() -> Result<(), u8> {
     let wait = Duration::from_secs(ONE_SECOND);
     sleep(wait);
 
+    // make server out of accept call
     let check_stream = TcpStream::connect(cmd_args[ADDRESS].clone());
 
     match check_stream {
         Err(_) => println!("Connection Failed"),
-        _ => println!("Wake the server out of accept method. Server should shutdown now."),
+        _ => println!("Wake the server out of accept call. Server should shutdown now."),
     }
 
     return Ok(());

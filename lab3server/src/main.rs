@@ -14,7 +14,7 @@ const FAIL_BAD_NETWORK_ADDRESS: u8 = 2;  //error return value
 //usage function
 //  print usage message
 fn usage(program_name: &String){
-    let result = writeln!(std::io::stdout().lock(), "usage: {} <script_file_name> [whinge]", program_name);
+    let result = writeln!(std::io::stdout().lock(), "usage: {} <address>", program_name);
 	match result {
         Err(e) => println!("Writeln error with {e}"),
         _ => {}

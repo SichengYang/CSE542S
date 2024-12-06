@@ -18,14 +18,16 @@ const NOT_SPOKEN: usize = 0;
 
 type PlayConfig = Vec<(String, String)>; //vector to store character name and character file name
 
+// This function will compare both player with async wrapper
 fn cmp_player(p1: &Arc<Mutex<Player>>, p2: &Arc<Mutex<Player>>) -> Ordering {
     if let Ok(ref async_p1) = p1.lock() {
         if let Ok(ref async_p2) = p2.lock() {
+            // Return the ordering of two player after locking
             match async_p1.partial_cmp(async_p2) {
                 Some(ord) => return ord,
                 _ => return Ordering::Equal,
             }
-        } else {
+        } else { // return equal otherwise
             let result = writeln!(
                 std::io::stderr().lock(),
                 "\t --Warning: Concurrency Hazard in SceneFragment::cmp function"
@@ -36,7 +38,7 @@ fn cmp_player(p1: &Arc<Mutex<Player>>, p2: &Arc<Mutex<Player>>) -> Ordering {
             }
             return Ordering::Equal;
         }
-    } else {
+    } else { // return equal otherwise
         let result = writeln!(
             std::io::stderr().lock(),
             "\t --Warning: Concurrency Hazard in SceneFragment::cmp function"
@@ -228,6 +230,7 @@ impl SceneFragment {
                 }
             }
 
+            // complain if no body say in this order
             if line_spoken_flag == NOT_SPOKEN {
                 if COMPLAIN.load(atomic::Ordering::SeqCst) {
                     //complain about line missing
@@ -244,8 +247,8 @@ impl SceneFragment {
                 order_tracking += 1; // move to next speaking order
             } else {
                 let mut has_duplicate_index = false;
+                //check if the current speaking have duplicate order, if there is still a same order, we will not increment
                 for player_index in 0..self.players.len() {
-                    //check if the current speaking match our order
                     if speaking_end_vec[player_index] == None {
                         continue;
                     }
@@ -269,6 +272,7 @@ impl SceneFragment {
                     }
                 }
 
+                // no increment if found the same index
                 if has_duplicate_index {
                     if COMPLAIN.load(atomic::Ordering::SeqCst) {
                         let result = writeln!(
