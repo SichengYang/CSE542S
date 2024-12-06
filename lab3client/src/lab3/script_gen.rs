@@ -66,7 +66,6 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>,
 					match reader.read_line(&mut status){
 						Err(_) => return Err(INTERNET_ERROR), // The response must have a status code or the internet is not stable
 						Ok(_) => {
-							println!("{status}");
 							if status.trim() == SUCCESS_MESSAGE.to_string() {
 								return Ok(reader);
 							} else{
