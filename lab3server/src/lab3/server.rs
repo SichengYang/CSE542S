@@ -14,7 +14,7 @@ use std::io::{Write, Read};
 // constant
 const SUCCESS: bool = true;
 const SERVER_START_FAILED: bool = false;
-const BUFFER_SIZE: usize = 128;
+const BUFFER_SIZE: usize = 255; // linux filename has maximum length of 255
 const BUFFER_INITIAL: u8 = 0;
 const HTTP_SUCCESS: usize = 200;
 const INTERNAL_SERVER_ERROR: usize = 400;
