@@ -65,20 +65,23 @@ pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>,
 
                     let mut reader = BufReader::new(Box::new(stream) as Box<dyn Read>);
                     let mut status = String::new();
-                    match reader.read_to_string(&mut status) {
+                    match reader.read_line(&mut status) {
                         Err(_) => return Err(INTERNET_ERROR), // The response must have a status code or the internet is not stable
                         Ok(_) => {
                             if status.trim() == SUCCESS_MESSAGE.to_string() {
                                 return Ok(reader);
                             } else {
-                                let result = writeln!(
-                                    std::io::stderr().lock(),
-                                    "Server response with status {status}"
-                                );
+                                let mut error_content = String::new();
+                                if let Ok(_) = reader.read_line(&mut error_content) {
+                                    let result = writeln!(
+                                        std::io::stderr().lock(),
+                                        "Server response with status {status}{error_content}"
+                                    );
 
-                                match result {
-                                    Err(write_e) => println!("Writeln error with {write_e:?}"),
-                                    _ => {}
+                                    match result {
+                                        Err(write_e) => println!("Writeln error with {write_e:?}"),
+                                        _ => {}
+                                    }
                                 }
                                 return Err(SERVER_FAILED);
                             }
