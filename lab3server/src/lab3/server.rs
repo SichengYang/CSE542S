@@ -16,6 +16,8 @@ const SUCCESS: bool = true;
 const SERVER_START_FAILED: bool = false;
 const BUFFER_SIZE: usize = 128;
 const BUFFER_INITIAL: u8 = 0;
+const HTTP_SUCCESS: usize = 200;
+const BODY_READ_ERROR: usize = 400;
 
 static CANCEL_FLAG: AtomicBool = AtomicBool::new(false);
 
@@ -76,12 +78,8 @@ impl Server{
                                 let mut buffer = [BUFFER_INITIAL; BUFFER_SIZE];
                                 match socket.read(&mut buffer){
                                     Err(_) => {
-                                        let result = writeln!(std::io::stderr().lock(), "read error with {addr}");
-
-                                        match result {
-                                            Err(write_e) => println!("Writeln error with {write_e:?}"),
-                                            _ => {}
-                                        }
+                                        let message: Vec<u8> = Vec::from("Server message: Failed to process request content".as_bytes());
+                                        respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
                                     },
                                     Ok(bytes_read) => {
                                         let body = String::from_utf8_lossy(&buffer[..bytes_read]);
@@ -94,17 +92,15 @@ impl Server{
                                             let filename = body.to_string();
                                             let re = Regex::new(r"[\$\\/]|(\.\.)").unwrap();
                                             if re.is_match(&filename){
+                                                let message: Vec<u8> = Vec::from("Server message: $, /, \\, and .. is not permited".as_bytes());
+                                                respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
                                                 return;
                                             }
 
                                             let buffer = match fs::read(filename.clone()){
                                                 Err(_) => {
-                                                    let result = writeln!(std::io::stderr().lock(), "\t --Warning: {} cannot be read", filename.clone());
-                                                    match result {
-                                                        Err(e) => println!("Writeln error with {e}"),
-                                                        _ => {}
-                                                    }
-                                                    socket.shutdown(Shutdown::Both).expect("Shutdown failed");
+                                                    let message: Vec<u8> = Vec::from(format!("Server message: File {filename} cannot be read").as_bytes());
+                                                    respond_to_socket(&mut socket, &addr, BODY_READ_ERROR, &message);
                                                     return;
                                                 },
                                                 Ok(data) => {
@@ -112,8 +108,7 @@ impl Server{
                                                 }
                                             };
 
-                                            respond_to_socket(&mut socket, &addr, 200, &buffer);
-                                            socket.shutdown(Shutdown::Both).expect("Shutdown failed");
+                                            respond_to_socket(&mut socket, &addr, HTTP_SUCCESS, &buffer);
                                             return;
                                         }
                                     }
@@ -148,4 +143,5 @@ fn respond_to_socket(socket: & mut TcpStream, addr: &SocketAddr, response_num: u
         },
         Ok(_) => {}
     };
+    socket.shutdown(Shutdown::Both).expect("Shutdown failed");
 }

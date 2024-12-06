@@ -7,6 +7,7 @@ pub const FAIL_CONNECTION: u8 = 4; //return value for Tcpstream connection fail
 pub const FAIL_OPEN_FILE: u8 = 5; //return value for fail to open fail sent by server
 pub const INTERNET_ERROR: u8 = 6;
 pub const SERVER_FAILED: u8 = 7;
+pub const INVALID_ADDR: u8 = 8;
 
 pub const END_OF_FILE: usize = 0;
 pub const SUCCESS_MESSAGE: &str = "HTTP/1.1 200";
