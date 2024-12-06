@@ -1,5 +1,5 @@
 // server.rs
-// Author: Sicheng Yang
+// Author: Sicheng Yang and Qinzou Song
 // This file contains the definitions of server. It will recieve the request from client and server requested file
 
 // import field
