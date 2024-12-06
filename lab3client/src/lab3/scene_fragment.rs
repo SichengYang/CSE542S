@@ -13,6 +13,9 @@ const CHARACTER: usize = 0;
 const CHARACTER_FILE: usize = 1;
 const TOKEN_NUM: usize = 2;
 const SPOKEN: usize = 1;
+const START: usize = 0;
+const NOT_SPOKEN: usize = 0;
+
 type PlayConfig = Vec<(String, String)>; //vector to store character name and character file name
 
 fn cmp_player(p1: &Arc<Mutex<Player>>, p2: &Arc<Mutex<Player>>) -> Ordering {
@@ -176,12 +179,12 @@ impl SceneFragment {
     pub fn recite(&mut self) {
         let mut current_character: String = "".to_string(); //variable to keep track of current character
 
-        let mut speaking_end_vec = vec![Some(0); self.players.len()]; //Initialize every index to 0
-        let mut order_tracking = 0; // this is used to track whether every index is included, default start with 0
+        let mut speaking_end_vec = vec![Some(START); self.players.len()]; //Initialize every index to 0
+        let mut order_tracking = START; // this is used to track whether every index is included, default start with 0
 
         // print everyone's dialog while someone still has dialog
-        while Self::player_still_have_dialog(&speaking_end_vec) && order_tracking < 100 {
-            let mut line_spoken_flag = 0;
+        while Self::player_still_have_dialog(&speaking_end_vec) {
+            let mut line_spoken_flag = NOT_SPOKEN;
             for player_index in 0..self.players.len() {
                 //check if the current speaking match our order
                 if speaking_end_vec[player_index] == None {
@@ -190,6 +193,7 @@ impl SceneFragment {
 
                 if let Ok(ref mut current_player) = self.players[player_index].lock() {
                     if current_player.lines[current_player.index].0 == order_tracking {
+                        //found a matching order
                         //if the player's next line number equal the current line number
                         if line_spoken_flag == SPOKEN {
                             //if the line is already spoken
@@ -209,7 +213,7 @@ impl SceneFragment {
 
                         current_player.speak(&mut current_character); //let player speak current line
                         speaking_end_vec[player_index] = current_player.next_line(); //check if player has next line
-                        line_spoken_flag = 1; //set line spoken flag to 1
+                        line_spoken_flag = SPOKEN; //set line spoken flag to 1
                     }
                 } else {
                     let result = writeln!(
@@ -224,8 +228,7 @@ impl SceneFragment {
                 }
             }
 
-            if line_spoken_flag == 0 {
-                //if the line was not spoken
+            if line_spoken_flag == NOT_SPOKEN {
                 if COMPLAIN.load(atomic::Ordering::SeqCst) {
                     //complain about line missing
                     let result = writeln!(
@@ -266,15 +269,17 @@ impl SceneFragment {
                     }
                 }
 
-                if has_duplicate_index && COMPLAIN.load(atomic::Ordering::SeqCst) {
-                    let result = writeln!(
-                        std::io::stderr().lock(),
-                        "\t --Warning: Index line \"{}\" is found again",
-                        order_tracking
-                    );
-                    match result {
-                        Err(e) => println!("Writeln error with {e}"),
-                        _ => {}
+                if has_duplicate_index {
+                    if COMPLAIN.load(atomic::Ordering::SeqCst) {
+                        let result = writeln!(
+                            std::io::stderr().lock(),
+                            "\t --Warning: Index line \"{}\" is found again",
+                            order_tracking
+                        );
+                        match result {
+                            Err(e) => println!("Writeln error with {e}"),
+                            _ => {}
+                        }
                     }
                 } else {
                     order_tracking += 1; // increment only if there is no duplicate index

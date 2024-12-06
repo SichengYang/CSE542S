@@ -41,10 +41,10 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
 
 pub fn get_buffered_reader(message: &String) -> Result<BufReader<Box<dyn Read>>, u8> {
     if let Some(addr) = message.strip_prefix("net:") {
-        let addr: Vec<&str> = addr.splitn(3, ':').collect();
-        if addr.len() == 3 {
-            let addr_port = addr[0].to_string() + ":" + addr[1];
-            let file_name = addr[2];
+        let link: Vec<&str> = addr.splitn(TOTAL_PARTS, ':').collect();
+        if link.len() == TOTAL_PARTS {
+            let addr_port = link[ADDR].to_string() + ":" + link[PORT];
+            let file_name = link[FILENAME];
 
             match TcpStream::connect(&addr_port) {
                 Ok(mut stream) => {

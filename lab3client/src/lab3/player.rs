@@ -6,6 +6,8 @@ use std::io::Write;
 
 type PlayLines = Vec<(usize, String)>;
 
+const DEFAULT_INDEX: usize = 0;
+
 //player struct with character name, lines, and line index
 #[derive(Eq, Ord, Debug)]
 pub struct Player{
@@ -20,7 +22,7 @@ impl Player{
     pub fn new(name: &String) -> Self{
         Self{name: name.to_string(), 
             lines: Vec::new(),
-            index: 0}
+            index: DEFAULT_INDEX}
     }
 
     //next line function to check if the player has next line
@@ -64,7 +66,9 @@ impl Player{
                 for line in speaking_lines {
                     self.add_script_line(&line);						
                 }
-                self.lines.sort_by(|a, b| (a.0).cmp(&b.0));  //sort the lines
+
+                //sort the lines by each player's speaking order
+                self.lines.sort_by(|a, b| (a.0).cmp(&b.0));
 
             }
         }
