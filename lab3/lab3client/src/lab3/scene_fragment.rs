@@ -21,6 +21,7 @@ const TOKEN_NUM: usize = 2;
 const SPOKEN: usize = 1;
 const START: usize = 0;
 const NOT_SPOKEN: usize = 0;
+const CONST_ONE: usize = 1;
 
 type PlayConfig = Vec<(String, String)>; //vector to store character name and character file name
 
@@ -193,7 +194,7 @@ impl SceneFragment {
         // print everyone's dialog while someone still has dialog
         while Self::player_still_have_dialog(&speaking_end_vec) {
             let mut line_spoken_flag = NOT_SPOKEN;
-            for player_index in 0..self.players.len() {
+            for player_index in START..self.players.len() {
                 //check if the current speaking match our order
                 if speaking_end_vec[player_index] == None {
                     continue;
@@ -250,11 +251,11 @@ impl SceneFragment {
                         _ => {}
                     }
                 }
-                order_tracking += 1; // move to next speaking order
+                order_tracking += CONST_ONE; // move to next speaking order
             } else {
                 let mut has_duplicate_index = false;
                 //check if the current speaking have duplicate order, if there is still a same order, we will not increment
-                for player_index in 0..self.players.len() {
+                for player_index in START..self.players.len() {
                     if speaking_end_vec[player_index] == None {
                         continue;
                     }

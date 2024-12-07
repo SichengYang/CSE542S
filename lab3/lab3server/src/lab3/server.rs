@@ -144,7 +144,7 @@ impl Server {
                                 }
                             });
                         }
-                        Err(network_e) => {
+                        Err(network_e) => {  //check if the connection fails
                             let result = writeln!(
                                 std::io::stderr().lock(),
                                 "Connection error with {network_e:?}"

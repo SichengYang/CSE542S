@@ -189,7 +189,7 @@ impl Play{
     //recite function
     //  print out the entire play to command line
     pub fn recite(&mut self){
-        for i in 0..self.fragments.len(){  //loop through all fragments
+        for i in FIRST_TOKEN..self.fragments.len(){  //loop through all fragments
             if let Ok(ref mut fragment) = self.fragments[i].lock() {
                 if i==FIRST_FRAGMENT{  //if it's the first fragment, enter_all
                     if let Ok(ref next_fragment) = self.fragments[i+INDEXING].lock(){

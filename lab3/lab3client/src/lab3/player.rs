@@ -13,6 +13,7 @@ use std::io::Write;
 type PlayLines = Vec<(usize, String)>;
 
 const DEFAULT_INDEX: usize = 0;
+const INDEXING_BY_ONE: usize = 1;
 
 //player struct with character name, lines, and line index
 #[derive(Eq, Ord, Debug)]
@@ -56,7 +57,7 @@ impl Player{
                 Err(e) => println!("Writeln error with {e}"),
                 _ => {}
             }
-            self.index+=1;  //update index to next line
+            self.index+=INDEXING_BY_ONE;  //update index to next line
         }else{  //else, skip this player
             return;
         }
@@ -74,7 +75,7 @@ impl Player{
                 }
 
                 //sort the lines by each player's speaking order
-                self.lines.sort_by(|a, b| (a.0).cmp(&b.0));
+                self.lines.sort_by(|&(ref a1, _), &(ref b1, _)| a1.cmp(b1));
 
             }
         }

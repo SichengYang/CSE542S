@@ -8,6 +8,7 @@ use std::process::ExitCode;
 use std::process::Termination;
 use std::io::Write;
 
+const CONST_ZERO: u8 = 0;
 //Return Wrapper with return val
 pub struct ReturnWrapper{
     val: u8
@@ -19,7 +20,7 @@ impl ReturnWrapper{
     pub fn new(result: Result<(), u8>) -> Self{
         match result{
             Err(e) => Self{val: e},
-            _ => Self{val: 0}
+            _ => Self{val: CONST_ZERO}
         }
         
     }
@@ -30,7 +31,7 @@ impl ReturnWrapper{
 //  print error message if return val is non zero
 impl Termination for ReturnWrapper{
     fn report(self) -> ExitCode{
-        if self.val != 0 {
+        if self.val != CONST_ZERO {
             let result = writeln!(std::io::stderr().lock(), "\t --Warning: Error: {}", self.val);
             match result {
                 Err(e) => println!("Writeln error with {e}"),
