@@ -59,11 +59,12 @@ Lastly, we modified the client(Step 13-14) to implement remote file IO, adding g
 
 1. Server and client correct behavior
 
+a) Remote file:
 Server: cargo run 127.0.0.1:7777 
 ----Server output------------------------------------------------------------------------------------------------------------------------------
 Received: normal.txt from 127.0.0.1:59168
 
-Client: cargo run normal.txt
+Client: cargo run net:127.0.0.1:7777:normal.txt 
 ----Client output------------------------------------------------------------------------------------------------------------------------------
 Hamlet Prince of Denmark ACT II Scene I A room in Polonius house by William Shakespeare 
 [Enter Polonius.]
@@ -94,11 +95,55 @@ Moreover that we much did long to see you,
 [Exit King.]
 ----END----------------------------------------------------------------------------------------------------------------------------------------
 
-Client: cargo run net:127.0.0.1:7777:normal.txt
+b) Local file IO:
+Client: cargo run normal.txt
 ----Client output------------------------------------------------------------------------------------------------------------------------------
-same as client local test result
+same as client remote test result
+
+c) Remote file IO
+Server: cargo run 127.0.0.1:7777 
+----Server output------------------------------------------------------------------------------------------------------------------------------
+Received: macbeth_i_2b_config_mod.txt from 127.0.0.1:60872
+Received: macbeth_i_1_config_mod.txt from 127.0.0.1:60871
+Received: macbeth_i_2a_config_mod.txt from 127.0.0.1:60870
+
+Client: cargo run partial_macbeth_act_i_script_mod.txt
+This file includes lines like "net:127.0.0.1:7777:macbeth_i_2a_config_mod.txt" and "DUNCAN net:127.0.0.1:7777:DUNCAN_macbeth_i_2a_mod.txt"
+----Client output------------------------------------------------------------------------------------------------------------------------------
+correctly output Macbeth scene one and scene two
 
 
+d) multiple client running:
+Server: cargo run 127.0.0.1:1234 
+----Server output------------------------------------------------------------------------------------------------------------------------------
+Received: normal_remote.txt from 127.0.0.1:33354
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33370
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33372
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33378
+Received: normal_remote.txt from 127.0.0.1:33392
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33404
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33414
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33426
+Received: normal_remote.txt from 127.0.0.1:33442
+Received: normal_remote.txt from 127.0.0.1:33446
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33462
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33464
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33478
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33494
+Received: normal_remote.txt from 127.0.0.1:33496
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33506
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33516
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33524
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33542
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33540
+Received: normal_remote.txt from 127.0.0.1:33544
+Received: hamlet_ii_1a_config.txt from 127.0.0.1:33556
+Received: hamlet_ii_1b_config.txt from 127.0.0.1:33548
+Received: hamlet_ii_2a_config.txt from 127.0.0.1:33560
+
+Client: cargo run net:127.0.0.1:1234:normal_remote.txt & cargo run net:127.0.0.1:1234:normal_remote.txt & cargo run net:127.0.0.1:1234:normal_remote.txt & cargo run net:127.0.0.1:1234:normal_remote.txt & cargo run net:127.0.0.1:1234:normal_remote.txt & cargo run net:127.0.0.1:1234:normal_remote.txt &
+----Client output------------------------------------------------------------------------------------------------------------------------------
+Multiple copies of normal output generated at a sudden. This server is nice!
 
 
 2. Test client correct behavior
@@ -174,25 +219,32 @@ Client: cargo run no_existing.txt
 ----Client output------------------------------------------------------------------------------------------------------------------------------
          --Warning: Invalid file name: no_existing.txt
          --Warning: Error: 5
-PS: Error code 5 is used for fail open file
-
-Server: not started
-Client: cargo run no_existing.txt
-----Client output------------------------------------------------------------------------------------------------------------------------------
-         --Warning: Invalid file name: no_existing.txt
-         --Warning: Error: 6
-PS: Error code 6 is used for fail open local file
+PS: Error code 5 is used for fail open local file
 
 Server: cargo run 127.0.0.1:7777
 ----Server output------------------------------------------------------------------------------------------------------------------------------
 Received: no_existing.txt from 127.0.0.1:59374
-Client: cargo run no_existing.txt
+Client: cargo run net:127.0.0.1:7777:no_existing.txt
 ----Client output------------------------------------------------------------------------------------------------------------------------------
 Server response with status HTTP/1.1 400
 Server message: File no_existing.txt cannot be read
          --Warning: Invalid file name: net:127.0.0.1:7777:no_existing.txt
          --Warning: Error: 7
 PS: Error code 7 is used for fail open remote file
+
+
+Server: cargo run 127.0.0.1:7777
+----Server output------------------------------------------------------------------------------------------------------------------------------
+Received: ./partial_macbeth_act_i_script_mod.txt from 127.0.0.1:61070
+Client: cargo run net:127.0.0.1:7777:./partial_macbeth_act_i_script_mod.txt
+----Client output------------------------------------------------------------------------------------------------------------------------------
+Server response with status HTTP/1.1 400
+Server message: $, /, \, and .. is not permited
+         --Warning: Invalid file name: net:127.0.0.1:7777:./partial_macbeth_act_i_script_mod.txt
+         --Warning: Error: 7
+PS: Error code 7 is used for fail open remote file
+
+
 
 Server: cargo run 127.0.0.1:7777
 ----Server output------------------------------------------------------------------------------------------------------------------------------
@@ -206,3 +258,31 @@ thread '<unnamed>' panicked at src\lab3\scene_fragment.rs:90:31:
 Thread panics in SceneFragment prepare
          --Warning: Error: 3
 PS: file_io.txt include non-existing player
+
+
+Remote file IO with whinge
+Server: cargo run 127.0.0.1:7777 
+----Server output------------------------------------------------------------------------------------------------------------------------------
+Received: macbeth_i_2b_config_mod.txt from 127.0.0.1:61045
+Received: macbeth_i_1_config_mod.txt from 127.0.0.1:61043
+Received: macbeth_i_2a_config_mod.txt from 127.0.0.1:61044
+
+Client: cargo run partial_macbeth_act_i_script_mod.txt whinge
+This file includes whinge triggers.
+----Client output------------------------------------------------------------------------------------------------------------------------------
+         --Warning: Config file line "net:127.0.0.1:7777:macbeth_i_1_config_mod.txt  STILL MORE EXTRA TOKENS" has extra tokens
+         --Warning: Config file line "" length not equal to 2
+         --Warning: Config file line "ALL ALL_macbeth_i_1_mod.txt  THESE ARE EXTRA TOKENS" length not equal to 2
+         --Warning: Config file line "ROSS ROSS_macbeth_i_2b_mod.txt  THESE ARE MORE EXTRA TOKENS" length not equal to 2
+         --Warning: Token NAN does not represent a value in usize
+Macbeth ACT I SCENE I An open Place Thunder and Lightning by William Shakespeare
+[Enter FIRST_WITCH.]
+[Enter SECOND_WITCH.]
+[Enter THIRD_WITCH.]
+[Enter ALL.]
+         --Warning: Character line "0" missing
+
+FIRST_WITCH
+When shall we three meet again?
+In thunder, lightning, or in rain?
+...
